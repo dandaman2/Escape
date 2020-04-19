@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="org.junit.jupiter:junit-jupiter:5.4.2">
+    <archive path="C:/Users/dfduff/.m2/repository/org/junit/jupiter/junit-jupiter/5.4.2/junit-jupiter-5.4.2.jar" />
+    <archive path="C:/Users/dfduff/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.4.2/junit-jupiter-api-5.4.2.jar" />
+    <archive path="C:/Users/dfduff/.m2/repository/org/apiguardian/apiguardian-api/1.0.0/apiguardian-api-1.0.0.jar" />
+    <archive path="C:/Users/dfduff/.m2/repository/org/opentest4j/opentest4j/1.1.1/opentest4j-1.1.1.jar" />
+    <archive path="C:/Users/dfduff/.m2/repository/org/junit/platform/junit-platform-commons/1.4.2/junit-platform-commons-1.4.2.jar" />
+    <archive path="C:/Users/dfduff/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.4.2/junit-jupiter-params-5.4.2.jar" />
+  </library>
+</eclipse-userlibraries>
+

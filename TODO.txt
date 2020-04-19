@@ -1,0 +1,295 @@
+Dan Duff (dfduff) TDD implementation
+
+Coordinates (CoordinateTest)
+Board configuration types depend on coordinate system used.
+0. SquareCoordinate
+    1. create square coordinate (makeCoordinate)
+        c = makeCoordinate(1, 1) != null
+            c.getX == 1: True
+            c.getY == 1: True
+            c.getX == 2: False
+            c.getY == 3: False
+        c = makeCoordinate(3, 2) != null
+            c.getX = 3: True
+            c.getY = 2: True
+        2. Square coordinates cannot have negative values
+        (x, y) = (0-1, 0-1) ex: (0, -1) or (-1, -1)
+        c = makeCoordinate(x,y): throws EscapeException
+
+    3. ensure coordinates are equal by location and object
+        c = makeCoordinate(1, 1)
+        c.equals(c): True // same coordinate object
+
+        c1 = makeCoordinate(3, 2)
+        c2 = makeCoordinate(3, 2)
+        c1.equals(c2): True // same x and y values
+
+        c1 = makeCoordinate(2, 4)
+        c2 = makeCoordinate(3, 4)
+        c1.equals(c2): False // different x values
+
+        c1 = makeCoordinate(2, 4)
+        c2 = makeCoordinate(2, 3)
+        c1.equals(c2): False // different y values
+
+        c1 = makeCoordinate(1, 4)
+        c2 = makeCoordinate(2, 3)
+        c1.equals(c2): False // different x and y values
+
+
+    4. Implement distanceTo(coordinate)
+    (x1, y1, x2, y2) = (5, 5, 7, 5), (5, 5, 7, 7), (5, 5, 5, 7), (5, 5, 3, 7),
+                        (5, 5, 3, 5), (5, 5, 3, 3), (5, 5, 5, 3), (5, 5, 7, 3)
+        c1 = makeCoordinate(x1, y1)
+        c2 = makeCoordinate(x2, y2)
+        c1.distanceTo(c2) = 2; //Direct orthagonal and directional movement
+
+        c1 = makeCoordinate(x2, y2)
+        c2 = makeCoordinate(x1, y1)
+        c1.distanceTo(c2) = 2; //Distance should be the same in any direction
+
+        5. distance to self should be zero
+            c1 = makeCoordinate(1, 1)
+            c2 = makeCoordinate(1, 1)
+            c1.distanceTo(c2) = 0: True // distance to self should be zero
+
+        6. Non-direct distance
+            (x, y) = (6, 3), (7, 4), (7, 6), (6, 7), (4, 7), (3, 6), (3, 4), (4, 3)
+            c1 = makeCoordinate(5, 5)
+            c2 = makeCoordinate(x, y)
+            c1.distanceTo(c2) = 2: True // valid distance while using orthagonal and diagonal
+
+            (x, y) = (6, 3), (7, 4), (7, 6), (6, 7), (4, 7), (3, 6), (3, 4), (4, 3)
+            c1 = makeCoordinate(5, 5)
+            c2 = makeCoordinate(x, y)
+            c1.distanceTo(c2) = 3: False // only valid for orthosquare, should use diagonals to have distance 2 instead of 3
+
+7. OrthoSquareCoordinate
+    8. Create Orthosquare coordinate (makeCoordinate)
+        c = makeCoordinate(1, 1) != null
+                    c.getX == 1: True
+                    c.getY == 1: True
+                    c.getX == 2: False
+                    c.getY == 3: False
+        c = makeCoordinate(3, 2) != null
+            c.getX = 3: True
+            c.getY = 2: True
+        9. OrthoSquare coordinates cannot have negative values
+        (x, y) = (0-1, 0-1) ex: (0, -1) or (-1, -1)
+        c = makeCoordinate(x,y): throws EscapeException
+
+         10. ensure coordinates are equal by location and object
+            c = makeCoordinate(1, 1)
+            c.equals(c): True // same coordinate object
+
+            c1 = makeCoordinate(3, 2)
+            c2 = makeCoordinate(3, 2)
+            c1.equals(c2): True // same x and y values
+
+            c1 = makeCoordinate(2, 4)
+            c2 = makeCoordinate(3, 4)
+            c1.equals(c2): False // different x values
+
+            c1 = makeCoordinate(2, 4)
+            c2 = makeCoordinate(2, 3)
+            c1.equals(c2): False // different y values
+
+            c1 = makeCoordinate(1, 4)
+            c2 = makeCoordinate(2, 3)
+            c1.equals(c2): False // different x and y values
+
+            11. Implement distanceTo(coordinate)
+                (x1, y1, x2, y2) = (5, 5, 7, 5), (5, 5, 6, 6), (5, 5, 5, 7), (5, 5, 4, 6),
+                                    (5, 5, 3, 5), (5, 5, 4, 4), (5, 5, 5, 3), (5, 5, 6, 4)
+                c1 = makeCoordinate(x1, y1)
+                c2 = makeCoordinate(x2, y2)
+                c1.distanceTo(c2) = 2; //Direct orthagonal movement
+
+                c1 = makeCoordinate(x2, y2)
+                c2 = makeCoordinate(x1, y1)
+                c1.distanceTo(c2) = 2; //Distance should be the same in any direction
+
+                12. distance to self should be zero
+                    c1 = makeCoordinate(1, 1)
+                    c2 = makeCoordinate(1, 1)
+                    c1.distanceTo(c2) = 0: True // distance to self should be zero
+
+                13. Non-direct distance
+                    (x, y) = (6, 3), (7, 4), (7, 6), (6, 7), (4, 7), (3, 6), (3, 4), (4, 3)
+                    c1 = makeCoordinate(5, 5)
+                    c2 = makeCoordinate(x, y)
+                    c1.distanceTo(c2) = 2: True // valid distance while using orthagonal
+
+                    (x, y) = (6, 3), (7, 4), (7, 6), (6, 7), (4, 7), (3, 6), (3, 4), (4, 3)
+                    c1 = makeCoordinate(5, 5)
+                    c2 = makeCoordinate(x, y)
+                    c1.distanceTo(c2) = 3: False // only valid for orthosquare
+
+14.HexCoordinate
+    15. Create Hex coordinate (makeCoordinate)
+            c = makeCoordinate(1, 1) != null
+                        c.getX == 1: True
+                        c.getY == 1: True
+                        c.getX == 2: False
+                        c.getY == 3: False
+            c = makeCoordinate(3, 2) != null
+                c.getX = 3: True
+                c.getY = 2: True
+            16. Hex coordinates can have negative values
+            (x, y) = (0-1, 0-1) ex: (0, -1) or (-1, -1)
+            c = makeCoordinate(x,y): Does not throw //negative and 0 values are valid hex coordinate positions
+
+            17. ensure coordinates are equal by location and object
+                c = makeCoordinate(1, 1)
+                c.equals(c): True // same coordinate object
+
+                c1 = makeCoordinate(3, 2)
+                c2 = makeCoordinate(3, 2)
+                c1.equals(c2): True // same x and y values
+
+                c1 = makeCoordinate(2, 4)
+                c2 = makeCoordinate(3, 4)
+                c1.equals(c2): False // different x values
+
+                c1 = makeCoordinate(2, 4)
+                c2 = makeCoordinate(2, 3)
+                c1.equals(c2): False // different y values
+
+                c1 = makeCoordinate(1, 4)
+                c2 = makeCoordinate(2, 3)
+                c1.equals(c2): False // different x and y values
+
+            18. Implement distanceTo(coordinate)
+            (x1, y1, x2, y2) = (0, 0, 0, 2), (0, 0, 1, 1), (0, 0, 2, 0), (0, 0, 2, -1),
+                                (0, 0, 2, -2), (0, 0, 1, -2), (0, 0, 0, -2), (0, 0, -1, -1),
+                                (0, 0, -2, 0), (0, 0, -2, 1), (0, 0, -2, 2), (0, 0, -1, 2)
+
+            c1 = makeCoordinate(x1, y1)
+                c2 = makeCoordinate(x2, y2)
+                c1.distanceTo(c2) = 2; // Hex movement in all directions
+
+                c1 = makeCoordinate(x2, y2)
+                c2 = makeCoordinate(x1, y1)
+                c1.distanceTo(c2) = 2; //Distance should be the same in any direction
+
+            19. distance to self should be zero
+                c1 = makeCoordinate(1, 1)
+                c2 = makeCoordinate(1, 1)
+                c1.distanceTo(c2) = 0: True // distance to self should be zero
+
+20. SquareBoard (BoardTest)
+    21. Creation of a square board (makeBoard)
+        BoardBuilder bb = (config1): Not Null
+        22. Creation of board through constructor
+            SquareBoard sb = new SquareBoard(5, 5): Not null
+            23. Cannot create a board with invalid inputs
+                SquareBoard sb = new SquareBoard(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (-5, -3): Throw Exception
+            24. Set/GetLocationType should set the type of a given, valid coordinate
+                SquareBoard sb = new SquareBoard(8, 8);
+                sb.setLocationType((4, 4), BLOCK->CLEAR->EXIT)
+                sb.getLocationType(4, 4) == BLOCK->CLEAR->EXIT: Equals // Set the type of block correctly
+                sb.getLocationType(1, 1) == CLEAR // default should be clear
+                25. Location should be within coordinates of the board
+                    SquareBoard sb = new SquareBoard(8, 8);
+                    sb.setLocationType((x, y), BLOCK): Throws Exception
+                        (x, y) = (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8)
+            26. Put/GetPieceAt
+                SquareBoard sb = new SquareBoard(8, 8);
+                sb.putPieceAt((4, 4), new EscapePiece(PLAYER1, HORSE));
+                sb.getPieceAt((4, 4)).player == PLAYER1: Equals
+                sb.getPieceAt((4, 4)).name == HORSE: Equals
+                27. Cannot get piece that was not placed (null)
+                    SquareBoard sb = new SquareBoard(8, 8);
+                    sb.getPieceAt(4, 4): Null // if no piece at location return null
+                28. Cannot get or put piece at location outside of board
+                    SquareBoard sb = new SquareBoard(8, 8);
+                    sb.putPieceAt(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8): Throw Exception
+                    sb.getPieceAt(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8): Throw Exception
+                29. Cannot place a piece at a location that is BLOCK'ed
+                     SquareBoard sb = new SquareBoard(8, 8);
+                     sb.setLocationType((4, 4), BLOCK);
+                     sb.putPiece((4, 4), new EscapePiece(PLAYER1, HORSE)): Throw Exception
+
+30. Set BoardBuilder to allow multiple Types (BoardTest) //Decided to modify preexisting boardbuilder
+    BoardsBuilder bb = (SquareBoards/SquareBoardConfig1.xml)
+        bb.makeBoard().instaceOf(SquareBoard.class): True
+        bb.makeBoard().getPieceAt((2, 2).name == HORSE)): Equals
+        bb.makeBoard().getLocationType((3, 5)) == BLOCK : Equals
+
+    BoardsBuilder bb = (SquareBoards/OrthoSquareBoardConfig1.xml)
+            bb.makeBoard().instaceOf(OrthoSquareBoard.class): True
+            bb.makeBoard().getPieceAt((2, 2).name == HORSE)): Equals
+            bb.makeBoard().getLocationType((3, 5)) == BLOCK : Equals
+
+    BoardsBuilder bb = (HexBoards/HexBoardConfig1.xml)
+                bb.makeBoard().instaceOf(HexBoard.class): True
+                bb.makeBoard().getPieceAt((0, 0).name == HORSE)): Equals
+                bb.makeBoard().getLocationType((3, 5)) == BLOCK : Equals
+
+
+     //To allow for all boards to be able to check locationTypes, A combined BoardWorker interface was created and used
+     within the boardbuilder. Tests Should also pass without error if boards are initialized correctly.
+
+31. OrthoSquareBoard (BoardTest)
+    32. Creation of an orthosquare board (makeBoard)
+        BoardBuilder bb = (config1): Not Null
+        33. Creation of board through constructor
+            OrthoSquareBoard sb = new OrthoSquareBoard(5, 5): Not null
+            34. Cannot create a board with invalid inputs
+                OrthoSquareBoard osb = new OrthoSquareBoard(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (-5, -3): Throw Exception
+            35. Set/GetLocationType should set the type of a given, valid coordinate
+                OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                osb.setLocationType((4, 4), BLOCK->CLEAR->EXIT)
+                osb.getLocationType(4, 4) == BLOCK->CLEAR->EXIT: Equals // Set the type of block correctly
+                osb.getLocationType(1, 1) == CLEAR // default should be clear
+                36. Location should be within coordinates of the board
+                    OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                    osb.setLocationType((x, y), BLOCK): Throws Exception
+                        (x, y) = (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8)
+            37. Put/GetPieceAt
+                OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                osb.putPieceAt((4, 4), new EscapePiece(PLAYER1, HORSE));
+                osb.getPieceAt((4, 4)).player == PLAYER1: Equals
+                osb.getPieceAt((4, 4)).name == HORSE: Equals
+                38. Cannot get piece that was not placed (null)
+                    OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                    osb.getPieceAt(2, 2): Null // if no piece at location return null
+                39. Cannot get or put piece at location outside of board
+                    OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                    osb.putPieceAt(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8): Throw Exception
+                    osb.getPieceAt(x, y) -> (0, 0), (-1, 0), (0, -1), (-1, -1), (8, 9), (9, 8): Throw Exception
+                40. Cannot place a piece at a location that is BLOCK'ed
+                     OrthoSquareBoard osb = new OrthoSquareBoard(8, 8);
+                     osb.setLocationType((4, 4), BLOCK);
+                     osb.putPiece((4, 4), new EscapePiece(PLAYER1, HORSE)): Throw Exception
+
+41. HexBoard
+    42. Creation of a hex board (makeBoard)
+        BoardBuilder bb = (config1): Not Null
+        43. Creation of board through constructor
+            HexBoard hb = new HexBoard(): Not null
+            44. Set/GetLocationType should set the type of a given, valid coordinate
+                HexBoard hb = new HexBoard();
+                hb.setLocationType((-1, -1), BLOCK->CLEAR->EXIT)
+                hb.getLocationType(-1, -1) == BLOCK->CLEAR->EXIT: Equals // Set the type of block correctly
+                hb.getLocationType(1, 1) == CLEAR // default should be clear
+            45. Put/GetPieceAt
+                HexBoard hb = new HexBoard();
+                hb.putPieceAt((4, 4), new EscapePiece(PLAYER1, HORSE));
+                hb.getPieceAt((4, 4)).player == PLAYER1: Equals
+                hb.getPieceAt((4, 4)).name == HORSE: Equals
+                46. Cannot get piece that was not placed (null)
+                    HexBoard hb = new HexBoard();
+                    hb.getPieceAt(2, 2): Null // if no piece at location return null
+                47. Cannot place a piece at a location that is BLOCK'ed
+                     HexBoard hb = new HexBoard();
+                     hb.setLocationType((4, 4), BLOCK);
+                     hb.putPiece((4, 4), new EscapePiece(PLAYER1, HORSE)): Throw Exception
+
+
+
+
+
+
+
+
