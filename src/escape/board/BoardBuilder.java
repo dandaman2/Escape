@@ -42,6 +42,11 @@ public class BoardBuilder
         bi = (BoardInitializer)mub.unmarshal(new FileReader(fileName));
 	}
 
+	public BoardBuilder(BoardInitializer bi) throws Exception
+	{
+		this.bi = bi;
+	}
+
 	/**
 	 * Method which returns a board object initialized with BoardInitializer
 	 * @return the board that has been initialized
