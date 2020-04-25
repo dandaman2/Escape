@@ -6,18 +6,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Copyright ©2020 Gary F. Pollice
  *******************************************************************************/
-//Dan Duff (dfduff)
-package escape.board;
 
-import escape.board.coordinate.Coordinate;
+package escape;
 
 /**
- * An interface which includes methods for interacting with locationTypes on a given board
- * @param <C> The coordinate system type used
+ * The interface for a client to use to get messages from the
+ * game manager by registering an observer. Any implementation of this
+ * must override the equals() method.
+ * 
+ * @version Apr 23, 2020
  */
-public interface Location<C extends Coordinate>{
-
+public interface GameObserver
+{
+    
 }

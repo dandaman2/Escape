@@ -52,7 +52,10 @@ public class OrthoSquareCoordinate implements Coordinate{
      * @return the integer distance between the two coordinates
      */
     @Override
-    public int distanceTo(Coordinate c){
+    public int distanceTo(Coordinate c)throws EscapeException{
+        if(!(c instanceof OrthoSquareCoordinate)){
+            throw new EscapeException("Can only calculate the distance of two coordinates of the same type");
+        }
         int diffX = Math.abs(this.getX()-((OrthoSquareCoordinate)c).getX());
         int diffY = Math.abs(this.getY()-((OrthoSquareCoordinate)c).getY());
         return diffX + diffY;

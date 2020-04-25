@@ -56,7 +56,11 @@ public class SquareCoordinate implements Coordinate
 	 * @return the integer distance between the two coordinates
 	 */
 	@Override
-	public int distanceTo(Coordinate c){
+	public int distanceTo(Coordinate c) throws EscapeException{
+		if(!(c instanceof SquareCoordinate)){
+			throw new EscapeException("Can only calculate the distance of two coordinates of the same type");
+		}
+
 		int diffX = Math.abs(this.getX()-((SquareCoordinate)c).getX());
 		int diffY = Math.abs(this.getY()-((SquareCoordinate)c).getY());
 		return Math.max(diffX, diffY);

@@ -83,6 +83,10 @@ public class BoardBuilder
 	 */
 	private void initializeBoard(BoardWorker b, BiFunction makeCoordinate, LocationInitializer... initializers)
 	{
+		//if not intitializers, return
+		if(initializers == null){
+			return;
+		}
 		for (LocationInitializer li : initializers) {
 			Coordinate c = (Coordinate)makeCoordinate.apply(li.x, li.y);
 			if (li.pieceName != null) {

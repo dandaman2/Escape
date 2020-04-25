@@ -47,7 +47,11 @@ public class HexCoordinate implements Coordinate{
      * @return the integer distance between the two coordinates
      */
     @Override
-    public int distanceTo(Coordinate c){
+    public int distanceTo(Coordinate c) throws EscapeException{
+        if(!(c instanceof HexCoordinate)){
+            throw new EscapeException("Can only calculate the distance of two coordinates of the same type");
+        }
+
         //implicitly uses conversion to cube logic
         return (Math.abs(this.x - ((HexCoordinate)c).getX())
                 + Math.abs(this.x + this.y - ((HexCoordinate)c).getX() - ((HexCoordinate)c).getY())

@@ -16,7 +16,10 @@ import escape.board.coordinate.Coordinate;
 
 /**
  * Collective interface to ensure that all boards have ways to interact with location types
- * and board coordinate features.
+ * and board coordinate features. Includes methods for interacting with locationTypes on a given board
  * @param <C> The coordinate system type used
  */
-public interface BoardWorker<C extends Coordinate> extends Location<C>, Board<C>{}
+public interface BoardWorker<C extends Coordinate> extends Board<C>{
+    void setLocationType(C coord, LocationType lt);
+    LocationType getLocationType(C coord);
+}

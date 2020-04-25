@@ -515,4 +515,14 @@ class CoordinateTest
         Coordinate c2 = HexCoordinate.makeCoordinate(1, 1);
         assertEquals(0, c1.distanceTo(c2));
     }
+
+    //cannot compare two coordinates of the different types
+    @Test
+    void notSameCoordTest(){
+        Coordinate c1 = HexCoordinate.makeCoordinate(1, 1);
+        Coordinate c2 = SquareCoordinate.makeCoordinate(1, 1);
+        assertThrows(EscapeException.class, ()->{
+           c1.distanceTo(c2);
+        });
+    }
 }
