@@ -13,8 +13,25 @@
 package escape;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.xml.bind.*;
+
+import escape.board.HexBoard;
+import escape.board.LocationType;
+import escape.board.OrthoSquareBoard;
+import escape.board.SquareBoard;
+import escape.board.coordinate.Coordinate;
+import escape.board.coordinate.HexCoordinate;
+import escape.board.coordinate.OrthoSquareCoordinate;
+import escape.board.coordinate.SquareCoordinate;
+import escape.exception.EscapeException;
+import escape.piece.EscapePiece;
 import escape.util.EscapeGameInitializer;
+import escape.util.LocationInitializer;
+import escape.util.PieceTypeInitializer;
+
+import static escape.board.coordinate.CoordinateID.*;
 
 /**
  * This class is what a client will use to creat an instance of a game, given
@@ -45,11 +62,64 @@ public class EscapeGameBuilder
     /**
      * Once the builder is constructed, this method creates the
      * EscapeGameManager instance.
-     * @return
+     * @return the EscapeGameManager single instance
      */
     public EscapeGameManager makeGameManager()
     {
-        // To be implemented
-        return null;
+        EscapeGameManager manager;
+        switch(gameInitializer.getCoordinateType()){
+            case SQUARE:
+                manager = new BetaGameManager<SquareCoordinate>(
+                        new SquareBoard(gameInitializer.getxMax(), gameInitializer.getyMax()),
+                        (x, y)->SquareCoordinate.makeCoordinate(x, y));
+                break;
+            case ORTHOSQUARE:
+                manager = new BetaGameManager<OrthoSquareCoordinate>(
+                        new OrthoSquareBoard(gameInitializer.getxMax(), gameInitializer.getyMax()),
+                        (x, y)->OrthoSquareCoordinate.makeCoordinate(x, y));
+                break;
+            case HEX:
+                manager = new BetaGameManager<HexCoordinate>(
+                        new HexBoard(),
+                        (x, y)->HexCoordinate.makeCoordinate(x, y));
+                break;
+            default:
+                throw new EscapeException("Coordinate type not recognized");
+        }
+        ((BetaGameManager)manager).setCoordID(gameInitializer.getCoordinateType());
+
+
+        //iterate through locations and add to board, if any
+        if(gameInitializer.getLocationInitializers() != null){
+            for(LocationInitializer location : gameInitializer.getLocationInitializers()){
+                Coordinate c = manager.makeCoordinate(location.x, location.y);
+                if(location.locationType != null){
+                    LocationType l = location.locationType;
+                    ((BetaGameManager)manager).getBoard().setLocationType(c, l);
+                }
+                if(location.pieceName != null){
+                    ((BetaGameManager)manager).getBoard().putPieceAt(
+                            EscapePiece.makePiece(location.player, location.pieceName), c);
+                }
+            }
+        }
+
+        //iterate through pieces, adding movement patterns and attributes
+        if(gameInitializer.getPieceTypes() != null){
+            for(PieceTypeInitializer piece : gameInitializer.getPieceTypes()){
+                ((BetaGameManager) manager).addPieceData(
+                        piece.getPieceName(),
+                        piece.getMovementPattern(),
+                        new ArrayList<>(Arrays.asList(piece.getAttributes())));
+            }
+        }
+
+        //Return new manager object
+        return manager;
+    }
+
+    //getter for initializer printing
+    public EscapeGameInitializer getGameInitializer() {
+        return gameInitializer;
     }
 }

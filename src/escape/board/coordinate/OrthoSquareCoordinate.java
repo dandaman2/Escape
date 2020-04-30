@@ -16,10 +16,7 @@ import escape.exception.EscapeException;
 
 import java.util.Objects;
 
-public class OrthoSquareCoordinate implements Coordinate{
-
-    private final int x;
-    private final int y;
+public class OrthoSquareCoordinate extends Coordinate2D{
 
     private OrthoSquareCoordinate(int x, int y)
     {
@@ -36,9 +33,9 @@ public class OrthoSquareCoordinate implements Coordinate{
      */
     public static OrthoSquareCoordinate makeCoordinate(int x, int y) throws EscapeException
     {
-        //orthosquare coordinates should be 1 or greater
-        if(x<1 || y<1)
-            throw new EscapeException("OrthoSquare Coordinates are not valid");
+//        //orthosquare coordinates should be 1 or greater
+//        if(x<1 || y<1)
+//            throw new EscapeException("OrthoSquare Coordinates are not valid");
 
         return new OrthoSquareCoordinate(x, y);
     }

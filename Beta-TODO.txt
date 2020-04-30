@@ -1,0 +1,59 @@
+Dan Duff (dfduff) Beta Release TOTO
+1. Create an implementation of EscapeGameManager (EGM): BetaGameManager
+    2. Implementation reads coordinate system and creates an appropriate object
+        makeGameManager -> ((BetaGameManager)emg): not Null
+    3. The Correct Coordinate Type and board size is produced from the manager based on the input file
+       (checking to ensure that typing is being properly assigned)
+        EGM.makeGameManager(square|ortho|hex game files)
+        EGM.makeCoordinate() // method to make a coordinate
+            manager.setBoardDimensions(GI.getCoordinateType(), GI.getXMax, GI.getYMax)
+            instanceof SquareCoordinate | OrthoSquareCoordinate | HexCoordinate: True
+        EGM.getBoard() // method to return the correct board type
+            instanceof SquareBoard | OrthoSquareBoard | HexBoard: True
+        4. Ensure that information that is parsed by the file is being assigned correctly
+            BetaGameManager(SQUARE, 18, 19) // Inside makeGameManager(file: SquareGame.xml)
+                ((SquareBoard)((BetaGameManager)emg).getBoard()).getXMax() == 18: Equals
+                ((SquareBoard)((BetaGameManager)emg).getBoard()).getYMax() == 19: Equals
+                ((BetaGameManager)emg).getCoordID() == SQUARE: Equals
+
+            BetaGameManager(SQUARE, 18, 19) // Inside makeGameManager(file: OrthoSquareGame.xml)
+                BetaGameManager.setBoardDimensions(ORTHOSQUARE, 20, 25)
+                ((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getXMax() == 20: Equals
+                ((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getYMax() == 25: Equals
+                ((BetaGameManager)emg).getCoordID() == ORTHOSQUARE: Equals
+
+    5. Placing the locations on the board from the input game file (default location type is CLEAR)
+        EGM.makeGameManager(file: SquareGame.xml)
+            ((BetaGameManager)emg).getBoard().getLocationType(3, 4) == CLEAR: Equals
+            ((BetaGameManager)emg).getBoard().getLocationType(5, 6) == BLOCK: Equals
+            ((BetaGameManager)emg).getBoard().getLocationType(8, 8) == CLEAR: Equals
+        6. If no location initializers are found, have every space as CLEAR
+            EGM.makeGameManager(file: BareGame.xml)
+                ((BetaGameManager)emg).getBoard().getLocationType(3, 4) == CLEAR: Equals
+                ((BetaGameManager)emg).getBoard().getLocationType(5, 6) == CLEAR: Equals
+                ((BetaGameManager)emg).getBoard().getLocationType(8, 8) == CLEAR: Equals
+        7. Throw an error if a read-in location coordinate is outside board
+            EGM.makeGameManager(file: LocationOutsideBoard.xml): Throw Error // coordinate (25, 26) on 20X20 board
+
+    8. Placing pieces and onto the board and getting them using the board's get/set piece system (ignoring attributes)
+        EGM.makeGameManager(square | ortho | hex)
+            ((BetaGameManager)emg).getBoard().putPieceAt(EP.makePiece(PLAYER1, HORSE), (3, 4))
+            emg.getPieceAt((3, 4)).getName == HORSE: Equals
+            emg.getPieceAt((3, 4)).getPlayer == PLAYER1: Equals
+
+        EGM.makeGameManager(file: SquareGame.xml)
+            emg.getPieceAt((3, 4)).getName == HORSE: Equals
+            emg.getPieceAt((3, 4)).getPlayer == PLAYER1: Equals
+
+    9. Reading in pieces with attributes (get Bool/Int Attributes) //unset attributes should be their default values
+         EGM.makeGameManager(file: SquareGame.xml)
+            ((BetaGameManager)emg).getIntPieceAttribute(HORSE, DISTANCE) == 10: Equals
+            ((BetaGameManager)emg).getIntPieceAttribute(FROG, DISTANCE) ==  5: Equals
+            (BetaGameManager)emg).getIntPieceAttribute(FROG, FLY) == 0: Equals
+
+         EGM.makeGameManager(file: SquareGame.xml)
+            ((BetaGameManager)emg).getBoolPieceAttribute(FROG, UNBLOCK): False
+            ((BetaGameManager)emg).getBoolPieceAttribute(HORSE, UNBLOCK): True
+
+
+

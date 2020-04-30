@@ -12,6 +12,8 @@
 
 package escape.piece;
 
+import java.util.HashMap;
+
 /**
  * This is a class for Pieces.
  * 
@@ -20,10 +22,10 @@ package escape.piece;
  * 
  * @version Mar 28, 2020
  */
-public class EscapePiece
-{
+public class EscapePiece{
     private final PieceName name;
     private final Player player;
+
     
     /**
      * Constructor that takes the player and piece name.
@@ -47,6 +49,7 @@ public class EscapePiece
 	{
 		return new EscapePiece(player, name);
 	}
+
 
 	/**
 	 * @return the name

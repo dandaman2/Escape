@@ -92,4 +92,14 @@ public class OrthoSquareBoard implements BoardWorker<OrthoSquareCoordinate>
            return squares.containsKey(coord)? squares.get(coord) : CLEAR;
         }
     }
+
+    //Getter for the max x coord of the board
+    public int getxMax() {
+        return xMax;
+    }
+
+    //Getter for the max y coord of the board
+    public int getyMax() {
+        return yMax;
+    }
 }

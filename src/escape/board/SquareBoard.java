@@ -28,7 +28,7 @@ import static escape.board.LocationType.CLEAR;
  */
 public class SquareBoard implements BoardWorker<SquareCoordinate>
 {
-	Map<SquareCoordinate, LocationType> squares;
+	public Map<SquareCoordinate, LocationType> squares;
 	Map<SquareCoordinate, EscapePiece> pieces;
 	
 	private final int xMax, yMax;
@@ -94,5 +94,15 @@ public class SquareBoard implements BoardWorker<SquareCoordinate>
 		}else{
 			return squares.containsKey(coord)? squares.get(coord) : CLEAR;
 		}
+	}
+
+	//Getter for the max x coord of the board
+	public int getxMax() {
+		return xMax;
+	}
+
+	//Getter for the max y coord of the board
+	public int getyMax() {
+		return yMax;
 	}
 }

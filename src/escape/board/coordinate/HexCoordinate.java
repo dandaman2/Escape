@@ -16,9 +16,7 @@ import escape.exception.EscapeException;
 
 import java.util.Objects;
 
-public class HexCoordinate implements Coordinate{
-    private final int x;
-    private final int y;
+public class HexCoordinate extends Coordinate2D{
 
     private HexCoordinate(int x, int y) {
         this.x = x;
@@ -34,7 +32,6 @@ public class HexCoordinate implements Coordinate{
      */
     public static HexCoordinate makeCoordinate(int x, int y)
     {
-
         return new HexCoordinate(x, y);
     }
 

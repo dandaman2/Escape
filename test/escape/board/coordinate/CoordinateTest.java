@@ -80,13 +80,13 @@ class CoordinateTest
     }
 
     // making an invalid coordinate throws an exception (0 and negative positions)
-    @ParameterizedTest
-    @MethodSource("invalidSquareCoordinateHelper")
-    void makeInvalidSquareCoordinates(int x, int y){
-        assertThrows(EscapeException.class, ()->{
-            Coordinate c = SquareCoordinate.makeCoordinate(x, y);
-        });
-    }
+//    @ParameterizedTest
+//    @MethodSource("invalidSquareCoordinateHelper")
+//    void makeInvalidSquareCoordinates(int x, int y){
+//        assertThrows(EscapeException.class, ()->{
+//            Coordinate c = SquareCoordinate.makeCoordinate(x, y);
+//        });
+//    }
 
     //ensures that the same object is equal to itself
     @Test
@@ -252,13 +252,13 @@ class CoordinateTest
     }
 
     // making an invalid coordinate throws an exception (0 and negative positions)
-    @ParameterizedTest
-    @MethodSource("invalidOrthoSquareCoordinateHelper")
-    void makeInvalidOrthoSquareCoordinates(int x, int y){
-        assertThrows(EscapeException.class, ()->{
-            Coordinate c = OrthoSquareCoordinate.makeCoordinate(x, y);
-        });
-    }
+//    @ParameterizedTest
+//    @MethodSource("invalidOrthoSquareCoordinateHelper")
+//    void makeInvalidOrthoSquareCoordinates(int x, int y){
+//        assertThrows(EscapeException.class, ()->{
+//            Coordinate c = OrthoSquareCoordinate.makeCoordinate(x, y);
+//        });
+//    }
 
     //ensures that the same object is equal to itself
     @Test

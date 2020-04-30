@@ -20,10 +20,7 @@ import java.util.Objects;
  * 
  * @version Mar 27, 2020
  */
-public class SquareCoordinate implements Coordinate
-{
-    private final int x;
-    private final int y;
+public class SquareCoordinate extends Coordinate2D {
     
     private SquareCoordinate(int x, int y)
     {
@@ -40,9 +37,9 @@ public class SquareCoordinate implements Coordinate
 	 */
     public static SquareCoordinate makeCoordinate(int x, int y) throws EscapeException
     {
-    	//square coordinates should be 1 or greater
-    	if(x<1 || y<1)
-    		throw new EscapeException("Square Coordinates are not valid");
+//    	//square coordinates should be 1 or greater
+//    	if(x<1 || y<1)
+//    		throw new EscapeException("Square Coordinates are not valid");
 
     	return new SquareCoordinate(x, y);
     }

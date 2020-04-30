@@ -1,0 +1,40 @@
+From Alpha:
+    Although the implementation of Alpha was fairly straightforward, it did require
+    effort to determine the best practices in formulating a baseline for the project.
+    By extending the Board interface with the BoardWorker interface, general manipulations
+    of the board (such as set/get location could be implemented for all board types.
+    (This is the type of variable stored in the BetaGameManager). In addition, in order to
+    assign the static coordinate functions to their respective board behaviors, a BiFunction
+    lambda variable was assigned to the given board type in game creation. Originally, this
+    allowed for the creation of coordinates to throw errors, should they be outside of their
+    given coordinate range (such as no negative square coordinates). This was changed for the
+    Beta release, as game rules could potentially override these assumptions.
+
+Beta:
+    For this implementation, much more of the game functionality was to be determined, such as
+    managing game assets and piece movement. For the creation/implementation of the GameManager
+    a Singleton design pattern was used. This was to ensure that all game functionality related
+    to the on single board instance, preventing multiple game managers from being used at a given time.
+    By using a singleton pattern, the referencing of the game manager became more globalized, but the
+    creation and manipulation became centralized to a single instance. While the instance's values can
+    be reset by using the GameBuilder, it guarantees that the data within the game is consistent.
+    All of these ideas have changed after discussing the model with the professor however.
+
+    In talking with the professor, because there is no shared UI for this project, the implementation of a
+    singleton was unnecessary. Instead, all attributes are tied to the class itself, rather than an inner instance.
+    This caused board-setting code to be moved from inside the manager to the builder. Regardless, the Manager still
+    holds information about the type of Coordinate system and board of the game. In addition, it also holds a Hashmap
+    of PieceData, where piece names are mapped to their respective movesets and pieces attributes that are read from the
+    input file.
+
+    Coming to the implementation of pieces, there are four movement types to implement (Orthagonal, Diagonal, Linear,
+    Omni). Piece movements depends on the attributes of the given piece, yet they are assigned during the
+    reading of the input file. Because of this, all movement rules are encapsulated in lambdas, assigned to piece names,
+    and have their movement validated based on the moving piece's attributes and the board setup.
+
+
+    An abstract Coordinate2D class was added and extended by all Coordinate subclasses. This allowed all 2D coordinates
+    to have getters for their X and Y values (so as to be compared in movement validity checks).
+
+    With the ability to access 2D coordinate information, a Dijkstra implementation finds the shortest path based on
+    the Coordinate's distanceTo method as a heuristic.
