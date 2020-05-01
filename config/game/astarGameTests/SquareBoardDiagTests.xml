@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<escapeGameInitializer>
+	<coordinateType>SQUARE</coordinateType>
+    <!-- Board items -->
+    <xMax>18</xMax>
+    <yMax>19</yMax>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>3</y>
+        <locationType>BLOCK</locationType>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>4</y>
+        <locationType>BLOCK</locationType>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>2</x>
+        <y>2</y>
+        <pieceName>FROG</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>8</y>
+        <pieceName>FROG</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>7</y>
+        <pieceName>FROG</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>2</x>
+        <y>7</y>
+        <pieceName>HORSE</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>4</x>
+        <y>8</y>
+        <pieceName>HORSE</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>2</x>
+        <y>3</y>
+        <pieceName>HORSE</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>5</x>
+        <y>3</y>
+        <pieceName>SNAIL</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>7</x>
+        <y>3</y>
+        <pieceName>HORSE</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+    
+    <!-- Piece items, an array of pieceTypes, 1 or more -->
+    <pieceTypes>
+        <pieceName>FROG</pieceName>
+        <movementPattern>DIAGONAL</movementPattern>
+        <attributes>
+            <id>DISTANCE</id>
+            <attrType>INTEGER</attrType>
+            <intValue>2</intValue>
+        </attributes>
+        <attributes>
+            <id>JUMP</id>
+            <attrType>BOOLEAN</attrType>
+            <booleanValue>true</booleanValue>
+        </attributes>
+    </pieceTypes>
+
+    <pieceTypes>
+        <pieceName>HORSE</pieceName>
+        <movementPattern>DIAGONAL</movementPattern>
+        <attributes>
+            <id>DISTANCE</id>
+            <attrType>INTEGER</attrType>
+            <intValue>2</intValue>
+        </attributes>
+        <attributes>
+            <id>UNBLOCK</id>
+            <attrType>BOOLEAN</attrType>
+            <booleanValue>true</booleanValue>
+        </attributes>
+    </pieceTypes>
+
+    <pieceTypes>
+        <pieceName>SNAIL</pieceName>
+        <movementPattern>DIAGONAL</movementPattern>
+        <attributes>
+            <id>DISTANCE</id>
+            <attrType>INTEGER</attrType>
+            <intValue>3</intValue>
+        </attributes>
+        <attributes>
+            <id>UNBLOCK</id>
+            <attrType>BOOLEAN</attrType>
+            <booleanValue>true</booleanValue>
+        </attributes>
+    </pieceTypes>
+</escapeGameInitializer>

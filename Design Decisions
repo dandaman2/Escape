@@ -36,5 +36,7 @@ Beta:
     An abstract Coordinate2D class was added and extended by all Coordinate subclasses. This allowed all 2D coordinates
     to have getters for their X and Y values (so as to be compared in movement validity checks).
 
-    With the ability to access 2D coordinate information, a Dijkstra implementation finds the shortest path based on
-    the Coordinate's distanceTo method as a heuristic.
+    With the ability to access 2D coordinate information, an AStar implementation finds the shortest path based on
+    the Coordinate's distanceTo method as a heuristic. Due to the fact that most movement types differed in the way
+    neighbors were analysed, another Neighbor functional interface was developed to represent the getNeighbor method
+    used by the algorithm.

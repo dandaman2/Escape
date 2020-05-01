@@ -20,16 +20,16 @@ import java.util.ArrayList;
  * Also contains methods for retrieving the data
  */
 public class PieceData {
-    private Movements movePattern;
+    private Movement movePattern;
     private ArrayList<PieceTypeInitializer.PieceAttribute> attributes;
 
-    public PieceData(Movements movement, ArrayList<PieceTypeInitializer.PieceAttribute> attributes){
+    public PieceData(Movement movement, ArrayList<PieceTypeInitializer.PieceAttribute> attributes){
         this.movePattern = movement;
         this.attributes = attributes;
     }
 
     //Getter for the movement pattern
-    public Movements getMovePattern() {
+    public Movement getMovePattern() {
         return movePattern;
     }
 

@@ -1,18 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <escapeGameInitializer>
-	<coordinateType>ORTHOSQUARE</coordinateType>
+	<coordinateType>SQUARE</coordinateType>
     <!-- Board items -->
-    <xMax>20</xMax>
-    <yMax>25</yMax>
-    <locationInitializers> <!-- An array of these, 0 or more -->
+    <xMax>18</xMax>
+    <yMax>19</yMax>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>2</y>
+        <locationType>BLOCK</locationType>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>3</x>
+        <y>3</y>
+        <locationType>BLOCK</locationType>
+    </locationInitializers>
+
+    <locationInitializers>
         <x>3</x>
         <y>4</y>
-        <locationType>CLEAR</locationType>
-    </locationInitializers>
-    <locationInitializers>
-        <x>5</x>
-        <y>6</y>
         <locationType>BLOCK</locationType>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>2</x>
+        <y>3</y>
+        <pieceName>FROG</pieceName>
+        <player>PLAYER1</player>
+    </locationInitializers>
+
+    <locationInitializers>
+        <x>1</x>
+        <y>2</y>
+        <pieceName>HORSE</pieceName>
+        <player>PLAYER1</player>
     </locationInitializers>
     
     <!-- Piece items, an array of pieceTypes, 1 or more -->
@@ -22,7 +44,7 @@
         <attributes>
             <id>DISTANCE</id>
             <attrType>INTEGER</attrType>
-            <intValue>2</intValue>
+            <intValue>5</intValue>
         </attributes>
         <attributes>
             <id>JUMP</id>
@@ -36,12 +58,7 @@
         <attributes>
             <id>DISTANCE</id>
             <attrType>INTEGER</attrType>
-            <intValue>2</intValue>
-        </attributes>
-        <attributes>
-            <id>JUMP</id>
-            <attrType>BOOLEAN</attrType>
-            <booleanValue>false</booleanValue>
+            <intValue>3</intValue>
         </attributes>
     </pieceTypes>
 </escapeGameInitializer>

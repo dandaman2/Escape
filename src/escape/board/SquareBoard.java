@@ -26,7 +26,7 @@ import static escape.board.LocationType.CLEAR;
  * would naturally add methods based upon their design.
  * @version Apr 2, 2020
  */
-public class SquareBoard implements BoardWorker<SquareCoordinate>
+public class SquareBoard implements BoardWorker<SquareCoordinate>, BoundedBoard
 {
 	public Map<SquareCoordinate, LocationType> squares;
 	Map<SquareCoordinate, EscapePiece> pieces;
@@ -97,12 +97,12 @@ public class SquareBoard implements BoardWorker<SquareCoordinate>
 	}
 
 	//Getter for the max x coord of the board
-	public int getxMax() {
+	public int getXMax() {
 		return xMax;
 	}
 
 	//Getter for the max y coord of the board
-	public int getyMax() {
+	public int getYMax() {
 		return yMax;
 	}
 }

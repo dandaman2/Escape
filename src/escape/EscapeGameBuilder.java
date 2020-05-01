@@ -71,25 +71,26 @@ public class EscapeGameBuilder
             case SQUARE:
                 manager = new BetaGameManager<SquareCoordinate>(
                         new SquareBoard(gameInitializer.getxMax(), gameInitializer.getyMax()),
-                        (x, y)->SquareCoordinate.makeCoordinate(x, y));
+                        SquareCoordinate::makeCoordinate);
                 break;
             case ORTHOSQUARE:
                 manager = new BetaGameManager<OrthoSquareCoordinate>(
                         new OrthoSquareBoard(gameInitializer.getxMax(), gameInitializer.getyMax()),
-                        (x, y)->OrthoSquareCoordinate.makeCoordinate(x, y));
+                        OrthoSquareCoordinate::makeCoordinate);
                 break;
             case HEX:
                 manager = new BetaGameManager<HexCoordinate>(
                         new HexBoard(),
-                        (x, y)->HexCoordinate.makeCoordinate(x, y));
+                        (HexCoordinate::makeCoordinate));
                 break;
             default:
                 throw new EscapeException("Coordinate type not recognized");
         }
+
+        //Set the Coordinate ID
         ((BetaGameManager)manager).setCoordID(gameInitializer.getCoordinateType());
 
-
-        //iterate through locations and add to board, if any
+        //Iterate through locations and add to board, if any
         if(gameInitializer.getLocationInitializers() != null){
             for(LocationInitializer location : gameInitializer.getLocationInitializers()){
                 Coordinate c = manager.makeCoordinate(location.x, location.y);
@@ -104,7 +105,7 @@ public class EscapeGameBuilder
             }
         }
 
-        //iterate through pieces, adding movement patterns and attributes
+        //Iterate through pieces, adding movement patterns and attributes
         if(gameInitializer.getPieceTypes() != null){
             for(PieceTypeInitializer piece : gameInitializer.getPieceTypes()){
                 ((BetaGameManager) manager).addPieceData(
@@ -114,11 +115,14 @@ public class EscapeGameBuilder
             }
         }
 
+        //print read-in data
+        //System.out.println(gameInitializer);
+
         //Return new manager object
         return manager;
     }
 
-    //getter for initializer printing
+    //Getter for initializer printing
     public EscapeGameInitializer getGameInitializer() {
         return gameInitializer;
     }

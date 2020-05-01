@@ -29,6 +29,7 @@ import escape.board.coordinate.OrthoSquareCoordinate;
 import escape.board.coordinate.SquareCoordinate;
 import escape.exception.EscapeException;
 import escape.piece.EscapePiece;
+import escape.piece.Movement;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -99,8 +100,8 @@ class BetaEscapeGameTests
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
-        assertEquals(((SquareBoard)((BetaGameManager)emg).getBoard()).getxMax(), 18);
-        assertEquals(((SquareBoard)((BetaGameManager)emg).getBoard()).getyMax(), 19);
+        assertEquals(((SquareBoard)((BetaGameManager)emg).getBoard()).getXMax(), 18);
+        assertEquals(((SquareBoard)((BetaGameManager)emg).getBoard()).getYMax(), 19);
         assertEquals(((BetaGameManager)emg).getCoordID(), CoordinateID.SQUARE);
     }
 
@@ -114,8 +115,8 @@ class BetaEscapeGameTests
         EscapeGameBuilder egb2 = new EscapeGameBuilder(new File("config/game/OrthoSquareGame.xml"));
         emg = egb2.makeGameManager();
 
-        assertEquals(((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getxMax(), 20);
-        assertEquals(((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getyMax(), 25);
+        assertEquals(((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getXMax(), 20);
+        assertEquals(((OrthoSquareBoard)((BetaGameManager)emg).getBoard()).getYMax(), 25);
         assertEquals(((BetaGameManager)emg).getCoordID(), CoordinateID.ORTHOSQUARE);
     }
 
@@ -186,10 +187,13 @@ class BetaEscapeGameTests
 
     //Test to make sure that integer piece attributes are being stored correctly
     @Test
-    void getIntAttributes() throws Exception{
+    void getIntAttributesTest() throws Exception{
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(((BetaGameManager)emg).hasPieceAttribute(HORSE, DISTANCE));
+        assertFalse(((BetaGameManager)emg).hasPieceAttribute(FROG, FLY));
+
         assertEquals(10, ((BetaGameManager)emg).getIntPieceAttribute(HORSE, DISTANCE));
         assertEquals(5, ((BetaGameManager)emg).getIntPieceAttribute(FROG, DISTANCE));
         assertEquals(0, ((BetaGameManager)emg).getIntPieceAttribute(FROG, FLY));
@@ -197,7 +201,7 @@ class BetaEscapeGameTests
 
     //Test to make sure that integer piece attributes are being stored correctly
     @Test
-    void getBoolAttributes() throws Exception{
+    void getBoolAttributesTest() throws Exception{
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
@@ -205,7 +209,186 @@ class BetaEscapeGameTests
         assertFalse(((BetaGameManager)emg).getBoolPieceAttribute(FROG, UNBLOCK));
     }
 
+    //Tests to make sure that an exception is thrown if the piece was not defined
+    @Test
+    void getUndefinedPieceBool(){
+        assertThrows(EscapeException.class, ()->{
+            EscapeGameBuilder egb
+                    = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
+            EscapeGameManager emg = egb.makeGameManager();
+            ((BetaGameManager)emg).getBoolPieceAttribute(SNAIL, UNBLOCK);
+        });
+    }
+
+    //Tests to make sure that an exception is thrown if the piece was not defined
+    @Test
+    void getUndefinedPieceInt(){
+        assertThrows(EscapeException.class, ()->{
+            EscapeGameBuilder egb
+                    = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
+            EscapeGameManager emg = egb.makeGameManager();
+            ((BetaGameManager)emg).getIntPieceAttribute(FOX, FLY);
+        });
+    }
+
+    //Tests to make sure that an exception is thrown if the piece was not defined
+    @Test
+    void getUndefinedPieceMovement(){
+        assertThrows(EscapeException.class, ()->{
+            EscapeGameBuilder egb
+                    = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
+            EscapeGameManager emg = egb.makeGameManager();
+            ((BetaGameManager)emg).getPieceMovePattern(FOX);
+        });
+    }
+
+    //Test to make sure that a piece with the unblock attribute should be able to move through blocked locations
+    @Test
+    void unblockedPieceTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(Movement.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, FROG), (BetaGameManager)emg, 5, 6));
+
+    }
+
+    //Test to make sure that a piece with the unblock attribute should be able to move through blocked locations
+    @Test
+    void unblockedUNBLOCKPieceTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(Movement.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, HORSE), (BetaGameManager)emg, 5, 6));
+    }
 
 
-    
+    //ORTHOGONAL//////////////////////////////////////////////////////
+
+    //Tests for determining if A star pathfinding is working for orthogonal movement
+    @Test
+    void firstOrthoMoveASTARTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/ThreeBlockSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(2, 3), emg.makeCoordinate(4,2)));
+    }
+
+    //Tests for determining if A star pathfinding is working for orthogonal movement
+    @Test
+    void secondOrthoMoveASTARTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/ThreeBlockSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(2, 2), emg.makeCoordinate(4,2)));
+    }
+
+    //Tests to check whether jumping is valid for
+    @Test
+    void checkOrthoJumpGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOrthoJumpTest.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(2, 3), emg.makeCoordinate(4,3)));
+    }
+
+    //Tests to check whether jumping is valid for ortho
+    @Test
+    void checkOrthoJumpBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOrthoJumpTest.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(2, 2), emg.makeCoordinate(4,2)));
+    }
+
+    //Tests to check whether jumping is valid for ortho
+    @Test
+    void checkOrthoSideJumpBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOrthoJumpTest.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(2, 3), emg.makeCoordinate(3,4)));
+    }
+
+    //Test to make sure cannot jump over 2 pieces
+    @Test
+    void checkOrthoDoubleJump()throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOrthoJumpTest.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(14, 14), emg.makeCoordinate(14,11)));
+    }
+    //Test to make sure cannot jump over 2 pieces
+    @Test
+    void checkOrthoSingleJump()throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOrthoJumpTest.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(14, 13), emg.makeCoordinate(14,11)));
+    }
+
+    //DIAGONAL/////////////////////////////////////////////////
+
+    //Tests to check whether diagonal movement is valid
+    @Test
+    void checkDiagMoveGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 3), emg.makeCoordinate(6,6)));
+    }
+
+    //Tests to check invalid diagonal moves
+    @Test
+    void checkDiagMoveBadTooFar() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(7, 3), emg.makeCoordinate(6,6)));
+    }
+    //Tests to check invalid diagonal moves
+    @Test
+    void checkDiagMoveBadNextTo() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(7, 3), emg.makeCoordinate(7,4)));
+    }
+
+    //Tests to check whether blocking works for diagonal
+    @Test
+    void checkDiagBlockBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(2, 2), emg.makeCoordinate(4,4)));
+    }
+
+    //Tests to check whether blocking works for diagonal
+    @Test
+    void checkDiagBlockGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(2, 3), emg.makeCoordinate(4,5)));
+    }
+
+    //Test to ensure jumping works properly for diagonal
+    @Test
+    void validDiagJump()throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(3, 8), emg.makeCoordinate(1,6)));
+    }
+
+    //Test to ensure jumping works properly for diagonal
+    @Test
+    void invalidDiagJump()throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardDiagTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(4, 8), emg.makeCoordinate(2,6)));
+    }
+
+
 }

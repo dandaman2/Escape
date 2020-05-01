@@ -23,7 +23,7 @@ import static escape.board.LocationType.CLEAR;
  * Similar implementation for Square board, but with OrthoSquare limitations
  * @version Apr 2, 2020
  */
-public class OrthoSquareBoard implements BoardWorker<OrthoSquareCoordinate>
+public class OrthoSquareBoard implements BoardWorker<OrthoSquareCoordinate>, BoundedBoard
 {
     Map<OrthoSquareCoordinate, LocationType> squares;
     Map<OrthoSquareCoordinate, EscapePiece> pieces;
@@ -94,12 +94,12 @@ public class OrthoSquareBoard implements BoardWorker<OrthoSquareCoordinate>
     }
 
     //Getter for the max x coord of the board
-    public int getxMax() {
+    public int getXMax() {
         return xMax;
     }
 
     //Getter for the max y coord of the board
-    public int getyMax() {
+    public int getYMax() {
         return yMax;
     }
 }

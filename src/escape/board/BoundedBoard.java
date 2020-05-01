@@ -9,15 +9,12 @@
  *
  * Copyright ©2016-2020 Gary F. Pollice
  *******************************************************************************/
-package escape.board.coordinate;
+package escape.board;
 
 /**
- * Abstract Class to unify consistencies among Coordinate types
+ * An interface which four-sided tile boards can implement to access boundaries
  */
-public abstract class Coordinate2D implements Coordinate {
-    protected int x;
-    protected int y;
-
-    public abstract int getX();
-    public abstract int getY();
+public interface BoundedBoard {
+    public int getXMax();
+    public int getYMax();
 }

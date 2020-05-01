@@ -12,23 +12,25 @@
 package escape;
 
 import escape.board.BoardWorker;
-import escape.board.HexBoard;
-import escape.board.OrthoSquareBoard;
-import escape.board.SquareBoard;
+import escape.board.LocationType;
 import escape.board.coordinate.*;
 import escape.exception.EscapeException;
 import escape.piece.*;
 import escape.util.PieceTypeInitializer;
 
-import javax.management.Attribute;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 
+/**
+ * Implementation of the EscapeGameManager interface
+ * @param <C> The Coordinate Type to use
+ */
 public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<C>{
 
     //The board itself
     private BoardWorker gameBoard;
+
     //The type of coordinates that the game board uses
     private CoordinateID coordID;
 
@@ -41,6 +43,8 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
 
     /**
      * The default constructor for creating the game manager
+     * @param board the game board
+     * @param makeCoordinate the static method for creating a coordinate of the proper type
      */
     public BetaGameManager(BoardWorker board, BiFunction<Integer, Integer, C> makeCoordinate){
         this.gameBoard = board;
@@ -53,7 +57,7 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
      * @param pattern the moveset to add
      */
     public void addPieceData(PieceName piece, MovementPatternID pattern, ArrayList<PieceTypeInitializer.PieceAttribute> attributes){
-        for(Movements move: Movements.values()){
+        for(Movement move: Movement.values()){
             if(move.name().equals(pattern.name())){
                 pieceData.put(piece, new PieceData(move, attributes));
             }
@@ -64,20 +68,18 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
      * See EscapeGameManager definition for details
      * @param from starting location
      * @param to ending location
-     * @return
+     * @return True if the move is valid, false otherwise
      */
     @Override
     public boolean move(C from, C to) {
         //Find the moveset for the piece in the from coordinate
         EscapePiece piece = getPieceAt(from);
-        if(piece == null){
-            return false; //no piece found at that location
+        if(piece == null || gameBoard.getLocationType(to) == LocationType.BLOCK){
+            return false; //no piece found at that location and cannot move to BLOCK location
         }
-
-        //Get the piece's moveset
-        //this.movesets.get(piece.getName()).isValid();
-
-        return false;
+        PieceData p = pieceData.get(piece.getName());
+        Movement m = p.getMovePattern();
+        return m.isValid(piece, from, to, this);
     }
 
     /**
@@ -125,14 +127,59 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
         return gameBoard;
     }
 
-    //Getter for a boolean attribute. Returns null if the piece was not defined
-    public boolean getBoolPieceAttribute(PieceName name, PieceAttributeID id){
+    /**
+     * Getter for a boolean attribute. Returns null if the piece was not defined
+     * @param name the piece name to search
+     * @param id the id to search
+     * @throws EscapeException if the piece data is not found in the hashmap
+     * @return the boolean value of the attribute
+     */
+    public boolean getBoolPieceAttribute(PieceName name, PieceAttributeID id) throws EscapeException{
+        if(!pieceData.containsKey(name)){
+            throw new EscapeException("Could not find the piece data for " +name.name()+"");
+        }
         return pieceData.get(name).getBoolAttrValue(id);
     }
 
-    //Getter for an int attribute. Returns null if the piece was not defined
-    public int getIntPieceAttribute(PieceName name, PieceAttributeID id){
+    /**
+     * * Getter for an int attribute. Returns null if the piece was not defined
+     * @param name the piece name to search
+     * @param id the id of the attribute
+     * @return the avlue of the Int attribute
+     * @throws EscapeException if the data is not found in the hashmap
+     */
+    public int getIntPieceAttribute(PieceName name, PieceAttributeID id) throws EscapeException{
+        if(!pieceData.containsKey(name)){
+            throw new EscapeException("Could not find the piece data for " +name.name()+"");
+        }
         return pieceData.get(name).getIntAttrValue(id);
+    }
+
+    /**
+     * Returns a boolean as to whether the piece contains the given attribute
+     * @param name the piece name to search
+     * @param id the id to search
+     * @throws EscapeException if the piece data is not found in the hashmap
+     * @return a boolean saying whether the piece has the attribute
+     */
+    public boolean hasPieceAttribute(PieceName name, PieceAttributeID id) throws EscapeException{
+        if(!pieceData.containsKey(name)){
+            throw new EscapeException("Could not find the piece data for " +name.name()+"");
+        }
+        return pieceData.get(name).hasAttribute(id);
+    }
+
+    /**
+     * Returns the movement pattern for the
+     * @param name the name of the piece to get the pattern from
+     * @throws EscapeException if the piece data is not found in the hashmap
+     * @return the Movement enum which holds the validity lambda
+     */
+    public Movement getPieceMovePattern(PieceName name) throws EscapeException{
+        if(!pieceData.containsKey(name)){
+            throw new EscapeException("Could not find the piece data for " +name.name()+"");
+        }
+        return pieceData.get(name).getMovePattern();
     }
 
 }
