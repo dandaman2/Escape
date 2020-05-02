@@ -29,6 +29,11 @@
         <movementPattern>LINEAR</movementPattern>
         <pieceName>HORSE</pieceName>
         <attributes>
+            <id>DISTANCE</id>
+            <attrType>INTEGER</attrType>
+            <intValue>5</intValue>
+        </attributes>
+        <attributes>
             <id>UNBLOCK</id>
             <attrType>BOOLEAN</attrType>
             <booleanValue>false</booleanValue>

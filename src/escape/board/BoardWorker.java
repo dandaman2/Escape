@@ -13,6 +13,7 @@
 package escape.board;
 
 import escape.board.coordinate.Coordinate;
+import escape.piece.EscapePiece;
 
 /**
  * Collective interface to ensure that all boards have ways to interact with location types
@@ -22,4 +23,5 @@ import escape.board.coordinate.Coordinate;
 public interface BoardWorker<C extends Coordinate> extends Board<C>{
     void setLocationType(C coord, LocationType lt);
     LocationType getLocationType(C coord);
+    EscapePiece removePieceAt(C coord);
 }

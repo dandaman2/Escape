@@ -446,4 +446,152 @@ class BetaEscapeGameTests
         EscapeGameManager emg = egb.makeGameManager();
         assertTrue(emg.move(emg.makeCoordinate(8, 2), emg.makeCoordinate(8,4)));
     }
+
+    //LINEAR//////////////////////////////////////////////////////////
+    //Checking valid horizontal movement
+    @Test
+    void linearHorizonalGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(5,7)));
+    }
+
+    //Checking invalid horizontal movement
+    @Test
+    void linearHorizonalBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(5,9)));
+    }
+
+    //Checking valid vertical movement
+    @Test
+    void linearVerticalGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(11,2)));
+    }
+
+    //Checking invalid vertical movement
+    @Test
+    void linearVerticalBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(12,2)));
+    }
+
+    //Checking valid diagonal movement
+    @Test
+    void linearDiagGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(1,6)));
+    }
+
+    //Checking invalid diagonal movement
+    @Test
+    void linearDiagBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(12,9)));
+    }
+
+    //Checking invalid linear movement
+    @Test
+    void linearChangeDirection() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(4,4)));
+    }
+
+    //Checking blocking for linear movement
+    @Test
+    void linearBlockingBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(5, 2), emg.makeCoordinate(2,2)));
+    }
+
+    //Checking blocking for linear movement
+    @Test
+    void linearBlockingGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(3, 1), emg.makeCoordinate(3,4)));
+    }
+
+    //Checking jumping for linear movement
+    @Test
+    void linearJumpBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(6,1)));
+    }
+
+    //Checking jumping for linear movement
+    @Test
+    void linearJumpGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardLinearTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(8, 8), emg.makeCoordinate(12,12)));
+    }
+
+
+    //FLY TESTS/////////////////////////////////////////////////////////////////
+    //Test to make sure flying works under normal circumstances
+    @Test
+    void goodFly() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/FlyTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 5), emg.makeCoordinate(1,1)));
+    }
+
+    //Test to make sure flying works over blocked locations
+    @Test
+    void goodBlockedFly() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/FlyTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 5), emg.makeCoordinate(5,1)));
+    }
+
+    //Test to make sure flying works over multiple pieces
+    @Test
+    void goodJumpFly() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/FlyTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(5, 6), emg.makeCoordinate(8,7)));
+    }
+
+    //Test to make sure flying works over multiple pieces
+    @Test
+    void diagonalFly() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/FlyTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(3, 6), emg.makeCoordinate(6,3)));
+    }
+
+    //Test to make sure flying works over multiple pieces
+    @Test
+    void invalidDiagonalFly() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/FlyTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(3, 6), emg.makeCoordinate(6,4)));
+    }
+
 }

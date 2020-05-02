@@ -13,6 +13,7 @@ package escape.board;
 
 import java.util.*;
 
+import escape.board.coordinate.Coordinate;
 import escape.board.coordinate.SquareCoordinate;
 import escape.exception.EscapeException;
 import escape.piece.EscapePiece;
@@ -94,6 +95,16 @@ public class SquareBoard implements BoardWorker<SquareCoordinate>, BoundedBoard
 		}else{
 			return squares.containsKey(coord)? squares.get(coord) : CLEAR;
 		}
+	}
+
+	/**
+	 * Removes a piece from the board and returns it
+	 * @param c the coordinate to remove the piece from
+	 * @return The piece that was removed, or null if no piece was at the given coordinate
+	 */
+	@Override
+	public EscapePiece removePieceAt(SquareCoordinate c) {
+		return pieces.remove(c);
 	}
 
 	//Getter for the max x coord of the board

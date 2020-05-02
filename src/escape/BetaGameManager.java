@@ -74,18 +74,45 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
     public boolean move(C from, C to) {
         //Find the moveset for the piece in the from coordinate
         EscapePiece piece = getPieceAt(from);
+        EscapePiece capturedPiece = getPieceAt(to);
+
+        //Return false if no piece on moving location or ending location is a block
         if(piece == null || gameBoard.getLocationType(to) == LocationType.BLOCK){
             return false; //no piece found at that location and cannot move to BLOCK location
         }
+
+        //Return false if the location being moved to has a piece of the same player
+        if(capturedPiece != null && capturedPiece.getPlayer() == piece.getPlayer()){
+            return false;
+        }
+
+        //Get the moveset from the piece data and evaluate
         PieceData p = pieceData.get(piece.getName());
         Movement m = p.getMovePattern();
-        return m.isValid(piece, from, to, this);
+        if(m.isValid(piece, from, to, this)){
+
+            //Remove enemy piece if captured
+            if(capturedPiece != null){
+                gameBoard.removePieceAt(to);
+            }
+
+            //remove current piece if exit
+            if(gameBoard.getLocationType(to) == LocationType.EXIT){
+                gameBoard.removePieceAt(from);
+            }
+
+            //move piece to location
+            gameBoard.putPieceAt(gameBoard.removePieceAt(from), to);
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * See EscapeGameManager definition for details
      * @param coordinate the location to probe
-     * @return
+     * @return The EscapePiece that was obtained at the location
      */
     @Override
     public EscapePiece getPieceAt(C coordinate) {

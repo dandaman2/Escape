@@ -39,4 +39,9 @@ Beta:
     With the ability to access 2D coordinate information, an AStar implementation finds the shortest path based on
     the Coordinate's distanceTo method as a heuristic. Due to the fact that most movement types differed in the way
     neighbors were analysed, another Neighbor functional interface was developed to represent the getNeighbor method
-    used by the algorithm.
+    used by the algorithm. Other than linear, the neighbor algorithm is they key defining feature between piece movements
+    (including hex boards).
+
+    When finding errors during parsing, an EscapeException is thrown from the gameBuilder. This would occur when reading
+    a diagonally moving piece onto a hex board, for example. All other validity tests are done at the start of a piece's
+    movement, which includes the functionality of physically moving/removing the pieces.

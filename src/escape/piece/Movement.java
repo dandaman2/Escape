@@ -13,6 +13,7 @@ package escape.piece;
 
 import escape.BetaGameManager;
 import escape.board.BoundedBoard;
+import escape.board.OrthoSquareBoard;
 import escape.board.coordinate.Coordinate;
 import escape.board.coordinate.Coordinate2D;
 import escape.board.coordinate.CoordinateID;
@@ -20,9 +21,7 @@ import escape.board.coordinate.CoordinateID;
 import java.util.*;
 
 import static escape.board.LocationType.BLOCK;
-import static escape.piece.PieceAttributeID.DISTANCE;
-import static escape.piece.PieceAttributeID.JUMP;
-import static escape.piece.PieceAttributeID.UNBLOCK;
+import static escape.piece.PieceAttributeID.*;
 
 /**
  * A functional interface to define a lambda which check the validity of a given move by a given piece on a given board
@@ -50,7 +49,6 @@ interface Neighbors {
  */
 public enum Movement implements MovePattern{
     ORTHOGONAL((piece, from, to, manager)->{
-
         if(manager.getCoordID() == CoordinateID.HEX ||
                 getPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
                         Movement::addStandardNeighborsToOpenList) == null){
@@ -59,7 +57,55 @@ public enum Movement implements MovePattern{
         return true;
     }),
     LINEAR((piece, from, to, manager)->{
-        return false;
+        Coordinate2D start = (Coordinate2D)from;
+        Coordinate2D end = (Coordinate2D)to;
+        //If path is not along a single line at every point, then invalid linear move
+        if(!alongLine(start.getX(), start.getY(), end.getX(), end.getY())){
+            //System.out.println("Not along line");
+            return false;
+        }
+
+        boolean justJumped = false;
+        boolean canFly = manager.hasPieceAttribute(piece.getName(), FLY);
+        int xIncr = Integer.compare(end.getX(), start.getX());
+        int yIncr = Integer.compare(end.getY(), start.getY());
+        int newX = start.getX() + xIncr;
+        int newY = start.getY() + yIncr;
+        int loops = 0;
+
+        //If diagonal line on an ortho board, return false
+        if(manager.getCoordID() == CoordinateID.ORTHOSQUARE && xIncr !=0 && yIncr !=0 ){
+            return false;
+        }
+        while(!(newX == end.getX() && newY == end.getY())) {
+            //System.out.println("about to check " + newX + ", " + newY);
+            if (!canFly) {
+                // Check jump
+                if (manager.getPieceAt(manager.makeCoordinate(newX, newY)) != null) {
+                    if (!justJumped && manager.hasPieceAttribute(piece.getName(), JUMP) && manager.getBoolPieceAttribute(piece.getName(), JUMP)) {
+                        justJumped = true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    justJumped = false;
+                }
+                // Check unblock
+                if (manager.getBoard().getLocationType(manager.makeCoordinate(newX, newY)) == BLOCK) {
+                    if (!(manager.hasPieceAttribute(piece.getName(), UNBLOCK) &&
+                            manager.getBoolPieceAttribute(piece.getName(), UNBLOCK))) {
+                        return false;
+                    }
+                }
+                newX += xIncr;
+                newY += yIncr;
+                loops++;
+            }
+        }
+        int dist = canFly?
+                manager.getIntPieceAttribute(piece.getName(), FLY) :
+                manager.getIntPieceAttribute(piece.getName(), DISTANCE);
+        return dist > loops;
     }),
     DIAGONAL((piece, from, to, manager)->{
         if(manager.getCoordID() != CoordinateID.SQUARE ||
@@ -99,33 +145,6 @@ public enum Movement implements MovePattern{
     }
 
     /**
-     * Returns a boolean as to whether a valid horizontal move can
-     * be made between the two input coordinates
-     * @param piece the piece to be checked or moved
-     * @param from the first input coordinate to check
-     * @param to the second input coordinate to check
-     * @param manager the game state
-     * @return True if a valid move can be made, False if the coordinates are not on the same horizontal plane,
-     * or there are other pieces in the way.
-     */
-    public static boolean validHorizMove(EscapePiece piece, Coordinate2D from, Coordinate2D to, BetaGameManager manager){
-        int start, end;
-        if(from.getY() < to.getY()){
-            start = from.getY() + 1;
-            end = to.getY();
-        }else{
-            start = to.getY() + 1;
-            end = from.getY();
-        }
-        for(int i = start; i<end; i++){
-            if(manager.getPieceAt(manager.makeCoordinate(from.getX(), i)) != null){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * A static function which determines if there are any paths to the given location.
      * Based on movement type.
      * @param start the coordinate to move from
@@ -161,14 +180,21 @@ public enum Movement implements MovePattern{
             path.add(0, now);
         }
 
-        //If the path is too long, return null
-        if(path.size()-1>manager.getIntPieceAttribute(piece.getName(), DISTANCE)){
+        //If the path is too long, return null (fly)
+        if(manager.hasPieceAttribute(piece.getName(), FLY) &&
+                path.size()-1>manager.getIntPieceAttribute(piece.getName(), FLY)){
+            return null;
+        }
+
+        //If the path is too long, return null (distance)
+        if(manager.hasPieceAttribute(piece.getName(), DISTANCE) &&
+                path.size()-1>manager.getIntPieceAttribute(piece.getName(), DISTANCE)){
             return null;
         }
 
         //Convert from nodes to proper coordinates
         for(Node n : path){
-            System.out.println(n.x+","+n.y);
+            //System.out.println(n.x+","+n.y);
             coordinatePath.add((Coordinate2D)manager.makeCoordinate(n.x, n.y));
         }
         return coordinatePath;
@@ -268,7 +294,10 @@ public enum Movement implements MovePattern{
         if(!(manager.getBoard() instanceof BoundedBoard)){
             return x == y && x != 0;
         }
-        return (manager.getPieceMovePattern(piece.getName()) != OMNI && x != 0 && y != 0);
+        if((manager.getBoard() instanceof OrthoSquareBoard)){
+            return  x != 0 && y != 0;
+        }
+        return (manager.getPieceMovePattern(piece.getName()) == ORTHOGONAL && x != 0 && y != 0);
     }
 
     /**
@@ -281,6 +310,11 @@ public enum Movement implements MovePattern{
      */
     public static boolean isUNBLOCKED(EscapePiece piece, BetaGameManager manager, int x, int y){
         Coordinate c = manager.makeCoordinate(x, y);
+
+        //Can fly over any blocked location
+        if(manager.hasPieceAttribute(piece.getName(), FLY)){
+            return true;
+        }
 
         if(manager.getBoard().getLocationType(c) == BLOCK){
            return (manager.getBoolPieceAttribute(piece.getName(), UNBLOCK));
@@ -299,6 +333,12 @@ public enum Movement implements MovePattern{
      * @return Returns a boolean indicating if the piece can jump to the toX or toY coordinates
      */
     private static boolean canJump(EscapePiece piece, Node now, int toX, int toY, BetaGameManager manager){
+
+        //Can fly over any blocked location
+        if(manager.hasPieceAttribute(piece.getName(), FLY)){
+            return true;
+        }
+
         if(now.justJumped){
             return alongLine(now.parent.x, now.parent.y, toX, toY)&&(!hasPiece(toX, toY, manager));
             //System.out.println("made it to jump code over "+ toX + "," + toY);
