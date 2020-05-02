@@ -116,3 +116,23 @@ Dan Duff (dfduff) Beta Release TOTO
                              HORSE: DIAG | Distance 2 no jump: False
 
 
+                21. Add omni neighbor functionality
+                    Standard:
+                        CanMove((2, 2)->(5, 6))
+                            SNAIL: OMNI| Distance 4: True
+                        CanMove((2, 3)->(5, 7))
+                             FROG: OMNI | Distance 2: False
+
+                    BLOCKING:
+                        BLOCK @ (7, 1), (7, 2), (7, 3), (9, 3)
+                        CanMove((8, 2)->(6, 1))
+                            FROG: OMNI | Distance 2 block: False
+                        CanMove((8, 3)->(6, 2))
+                             HORSE: OMNI | Distance 2 unblock: True
+
+                    JUMPING:
+                        Piece @ (8, 3), (7, 6)
+                        CanMove((8, 2)->(8, 4))
+                            FROG: OMNI | Distance 2 jump: True
+                        CanMove((6, 7)->(8, 5))
+                             FOX: OMNI | Distance 2 no jump: False

@@ -391,4 +391,59 @@ class BetaEscapeGameTests
     }
 
 
+    //OMNI////////////////////////////////////////////////////////////
+
+    //Tests to check whether omni movement is valid
+    @Test
+    void checkOmniMoveGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(2, 2), emg.makeCoordinate(5,6)));
+    }
+
+    //Tests to check whether omni movement is valid
+    @Test
+    void checkOmniMoveBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(2, 3), emg.makeCoordinate(5,7)));
+    }
+
+    //Tests to check whether omni movement is valid with blocking
+    @Test
+    void checkOmniBlockBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(8, 2), emg.makeCoordinate(6,1)));
+    }
+
+    //Tests to check whether omni movement is valid with blocking
+    @Test
+    void checkOmniBlockGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(8, 3), emg.makeCoordinate(6,2)));
+    }
+
+    //Tests to check whether omni movement is valid with jumping
+    @Test
+    void checkOmniJumpBad() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertFalse(emg.move(emg.makeCoordinate(6, 7), emg.makeCoordinate(8,5)));
+    }
+
+    //Tests to check whether omni movement is valid with jumping
+    @Test
+    void checkOmniJumpGood() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/astarGameTests/SquareBoardOmniTests.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        assertTrue(emg.move(emg.makeCoordinate(8, 2), emg.makeCoordinate(8,4)));
+    }
 }

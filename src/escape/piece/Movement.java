@@ -70,7 +70,8 @@ public enum Movement implements MovePattern{
         return true;
     }),
     OMNI((piece, from, to, manager)->{
-        return false;
+        return getPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
+                Movement::addStandardNeighborsToOpenList) != null;
     });
 
     //The variable which hold a validity check function
@@ -186,7 +187,7 @@ public enum Movement implements MovePattern{
         Node node;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                if (x != 0 && y != 0) {
+                if (shouldSkip(piece, manager, x, y)) {
                     continue; // skip if diagonal movement is not allowed
                 }
                 node = new Node(now, now.x + x, now.y + y, now.g,
@@ -253,6 +254,21 @@ public enum Movement implements MovePattern{
                     && (now.y + y >= 1 && now.y + y < board.getYMax());
         }
         return true;
+    }
+
+    /**
+     * Checks if the algorithm should skip over the x, y coordinate when checking neighbors
+     * @param piece the piece being moved
+     * @param manager the game manager
+     * @param x the x coordinate to move to
+     * @param y the y coordinate to move to
+     * @return
+     */
+    public static boolean shouldSkip(EscapePiece piece, BetaGameManager manager, int x, int y){
+        if(!(manager.getBoard() instanceof BoundedBoard)){
+            return x == y && x != 0;
+        }
+        return (manager.getPieceMovePattern(piece.getName()) != OMNI && x != 0 && y != 0);
     }
 
     /**
