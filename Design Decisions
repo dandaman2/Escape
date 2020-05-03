@@ -1,3 +1,4 @@
+Dan Duff (dfduff)
 From Alpha:
     Although the implementation of Alpha was fairly straightforward, it did require
     effort to determine the best practices in formulating a baseline for the project.
@@ -12,7 +13,10 @@ From Alpha:
 
 Beta:
     For this implementation, much more of the game functionality was to be determined, such as
-    managing game assets and piece movement. For the creation/implementation of the GameManager
+    managing game assets and piece movement. The creation and setting of the game manager, and its held board,
+    are created by the EscapeGameBuilder, read-in from the configuration file. 
+    
+    For the creation/implementation of the GameManager
     a Singleton design pattern was used. This was to ensure that all game functionality related
     to the on single board instance, preventing multiple game managers from being used at a given time.
     By using a singleton pattern, the referencing of the game manager became more globalized, but the
@@ -23,22 +27,23 @@ Beta:
     In talking with the professor, because there is no shared UI for this project, the implementation of a
     singleton was unnecessary. Instead, all attributes are tied to the class itself, rather than an inner instance.
     This caused board-setting code to be moved from inside the manager to the builder. Regardless, the Manager still
-    holds information about the type of Coordinate system and board of the game. In addition, it also holds a Hashmap
-    of PieceData, where piece names are mapped to their respective movesets and pieces attributes that are read from the
-    input file.
+    holds information about the type of Coordinate system and board of the game. 
 
     Coming to the implementation of pieces, there are four movement types to implement (Orthagonal, Diagonal, Linear,
     Omni). Piece movements depends on the attributes of the given piece, yet they are assigned during the
     reading of the input file. Because of this, all movement rules are encapsulated in lambdas, assigned to piece names,
-    and have their movement validated based on the moving piece's attributes and the board setup.
+    and have their movement validated based on the moving piece's attributes and the board setup. This is all represented 
+    in the PieceData class, which holds a list of attributes and the lambda function movement pattern for a given piece. 
+    Piece names are mapped to PieceData in the form of a Hashmap in the game manager, with entries being added in during the
+    creation of the game manager.
 
 
-    An abstract Coordinate2D class was added and extended by all Coordinate subclasses. This allowed all 2D coordinates
-    to have getters for their X and Y values (so as to be compared in movement validity checks).
+    When defining the specifics of a move, an abstract Coordinate2D class was added and extended by all current Coordinate subclasses. 
+    This allowed all 2D coordinates to have getters for their X and Y values (so as to be compared in movement validity checks).
 
     With the ability to access 2D coordinate information, an AStar implementation finds the shortest path based on
     the Coordinate's distanceTo method as a heuristic. Due to the fact that most movement types differed in the way
-    neighbors were analysed, another Neighbor functional interface was developed to represent the getNeighbor method
+    neighbors were analyzed, another Neighbor functional interface was developed to represent the getNeighbor method
     used by the algorithm. Other than linear, the neighbor algorithm is they key defining feature between piece movements
     (including hex boards).
 

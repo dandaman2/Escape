@@ -12,7 +12,7 @@
 package escape.board;
 
 /**
- * An interface which four-sided tile boards can implement to access boundaries
+ * An interface which boards that use boundaries can implement to access boundary components
  */
 public interface BoundedBoard {
     public int getXMax();

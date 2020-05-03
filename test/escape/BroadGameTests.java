@@ -276,6 +276,4 @@ public class BroadGameTests {
             EscapeGameManager emg = egb.makeGameManager();
         });
     }
-
-
 }
