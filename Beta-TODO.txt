@@ -244,11 +244,27 @@ Dan Duff (dfduff) Beta Release TOTO
             egm.makeGameManager(No Distance or Fly defined for FROG): Throw Error
             egm.makeGameManager(Both Distance and Fly defined for FROG): Throw Error
 
+        34. Piece should move when move method is run
+            getPieceAt(12, 12) == FROG
+            getPieceAt(12, 11) == null
+            canMove((12, 12)->(12, 11))
+            getPieceAt(12, 12) == null
+            getPieceAt(12, 11) == FROG
 
-    - piece should be removed on the exit location
+        35. Piece should be removed on the exit location
+            EXIT @ (12, 17)
+            getPieceAt(12, 12) == FROG
+            canMove((12, 12)->(12, 17))
+            getPieceAt(12, 12) == null
+            getPieceAt(12, 17) == null
 
-    -enemy piece should be removed if captured
+        36. Enemy piece should be removed if captured
+            getPieceAt(12, 12) == FROG (player 1)
+            getPieceAt(12, 15) == FROG (player 2)
+            canMove((12, 12)->(12, 15))
+            getPieceAt(12, 12) == null
+            getPieceAt(12, 15) == FROG (player 1)
 
-    -should throw error when placing piece that isnt defined
-    -should throw error if no piece rules are defined
-
+        37. Should throw error when placing piece that is not defined
+            egm.makeGameManager(NoPieceRuleDefined): Throw Error
+                (FROG placed, but no rules defined)

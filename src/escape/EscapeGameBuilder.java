@@ -67,7 +67,7 @@ public class EscapeGameBuilder
      */
     public EscapeGameManager makeGameManager()
     {
-        EscapeGameManager manager;
+        BetaGameManager manager;
         switch(gameInitializer.getCoordinateType()){
             case SQUARE:
                 manager = new BetaGameManager<SquareCoordinate>(
@@ -89,14 +89,14 @@ public class EscapeGameBuilder
         }
 
         //Set the Coordinate ID
-        ((BetaGameManager)manager).setCoordID(gameInitializer.getCoordinateType());
+        manager.setCoordID(gameInitializer.getCoordinateType());
 
         //Iterate through pieces, adding movement patterns and attributes
         if(gameInitializer.getPieceTypes() != null){
             for(PieceTypeInitializer piece : gameInitializer.getPieceTypes()){
                 // Check if read-in piece is valid to create data for
-                checkValidPieceRules(piece, ((BetaGameManager)manager).getCoordID());
-                ((BetaGameManager) manager).addPieceData(
+                checkValidPieceRules(piece, manager.getCoordID());
+                manager.addPieceData(
                         piece.getPieceName(),
                         piece.getMovementPattern(),
                         new ArrayList<>(Arrays.asList(piece.getAttributes())));
@@ -109,11 +109,12 @@ public class EscapeGameBuilder
                 Coordinate c = manager.makeCoordinate(location.x, location.y);
                 if(location.locationType != null){
                     LocationType l = location.locationType;
-                    ((BetaGameManager)manager).getBoard().setLocationType(c, l);
+                    manager.getBoard().setLocationType(c, l);
                 }
                 if(location.pieceName != null){
-                    ((BetaGameManager)manager).getBoard().putPieceAt(
-                            EscapePiece.makePiece(location.player, location.pieceName), c);
+                    if(!manager.hasPieceData(location.pieceName))
+                        throw new EscapeException("No rules or attributes were found for piece "+location.pieceName);
+                    manager.getBoard().putPieceAt(EscapePiece.makePiece(location.player, location.pieceName), c);
                 }
             }
         }

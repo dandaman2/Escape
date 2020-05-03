@@ -65,6 +65,15 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
     }
 
     /**
+     * Boolean check as to whether rules ahave been defined for a given piece
+     * @param piece the piece to check for
+     * @return Boolean as to whether the manager contains data for the given piece
+     */
+    public boolean hasPieceData(PieceName piece){
+        return pieceData.containsKey(piece);
+    }
+
+    /**
      * See EscapeGameManager definition for details
      * @param from starting location
      * @param to ending location

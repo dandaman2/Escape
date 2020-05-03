@@ -1,13 +1,13 @@
 package escape;
 
 import escape.exception.EscapeException;
+import escape.piece.PieceName;
+import escape.piece.Player;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BroadGameTests {
     //Test to make sure orthogonal movement only works on bounded boards (square, ortho)
@@ -195,7 +195,7 @@ public class BroadGameTests {
         assertFalse(emg.move(emg.makeCoordinate(3, 1), emg.makeCoordinate(3,1)));
     }
 
-    //FLY and DISTANCE CHECKING
+    //FLY and DISTANCE CHECKING////////////////////////////////////////////////
 
     //An error should be thrown if Fly or Distance are not defined
     @Test
@@ -216,5 +216,66 @@ public class BroadGameTests {
             EscapeGameManager emg = egb.makeGameManager();
         });
     }
+
+    //Physical Movement Tests/////////////////////////////////////////////////
+
+    //Test to ensure that pieces are physically moving when moved
+    @Test
+    void moveToLocationTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/OrthoSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)).getName(), PieceName.FROG);
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 11)), null);
+
+        emg.move(emg.makeCoordinate(12, 12), emg.makeCoordinate(12,11));
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)), null);
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 11)).getName(), PieceName.FROG);
+    }
+
+    //Test to ensure that a piece is removed when reaching a valid EXIT location
+    @Test
+    void moveToExitTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/HexGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)).getName(), PieceName.FROG);
+
+        emg.move(emg.makeCoordinate(12, 12), emg.makeCoordinate(12,17));
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)), null);
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 17)), null);
+
+    }
+
+    //Test to ensure that pieces are physically moving when moved
+    @Test
+    void captureEnemyPieceTest() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/game/HexGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)).getPlayer(), Player.PLAYER1);
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(15, 12)).getPlayer(), Player.PLAYER2);
+
+        emg.move(emg.makeCoordinate(12, 12), emg.makeCoordinate(15,12));
+
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(12, 12)), null);
+        assertEquals(emg.getPieceAt(emg.makeCoordinate(15, 12)).getPlayer(), Player.PLAYER1);
+    }
+
+    //An error should be thrown if a piece that has no rules is placed
+    @Test
+    void noRulesDefinedTest() throws Exception{
+        assertThrows(EscapeException.class, ()->{
+            EscapeGameBuilder egb
+                    = new EscapeGameBuilder(new File("config/game/edgeCaseGames/NoPieceRuleDefined.xml"));
+            EscapeGameManager emg = egb.makeGameManager();
+        });
+    }
+
 
 }
