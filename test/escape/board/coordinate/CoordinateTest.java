@@ -6,8 +6,8 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Copyright ©2020 Gary F. Pollice
+ *
+ * Copyright Â©2020 Gary F. Pollice
  *******************************************************************************/
 
 package escape.board.coordinate;
@@ -521,8 +521,31 @@ class CoordinateTest
     void notSameCoordTest(){
         Coordinate c1 = HexCoordinate.makeCoordinate(1, 1);
         Coordinate c2 = SquareCoordinate.makeCoordinate(1, 1);
+        c2.toString();
         assertThrows(EscapeException.class, ()->{
-           c1.distanceTo(c2);
+            c1.distanceTo(c2);
+        });
+    }
+
+    //cannot compare two coordinates of the different types
+    @Test
+    void notSameCoordTest2(){
+        Coordinate c2 = OrthoSquareCoordinate.makeCoordinate(1, 1);
+        Coordinate c1 = SquareCoordinate.makeCoordinate(1, 1);
+        c2.toString();
+        assertThrows(EscapeException.class, ()->{
+            c1.distanceTo(c2);
+        });
+    }
+
+    //cannot compare two coordinates of the different types
+    @Test
+    void notSameCoordTest3(){
+        Coordinate c1 = OrthoSquareCoordinate.makeCoordinate(1, 1);
+        Coordinate c2 = HexCoordinate.makeCoordinate(1, 1);
+        c2.toString();
+        assertThrows(EscapeException.class, ()->{
+            c1.distanceTo(c2);
         });
     }
 }

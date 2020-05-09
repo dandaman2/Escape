@@ -34,13 +34,12 @@ interface MovePattern {
 
 /**
  * A functional interface to define a lambda which gets the appropriate neighbors in the AStar algorithm.
- * Includes the currently-analyzed node, the open and closed node lists, the game manager, and the piece being moved
+ * This checks to make sure that a given change in coordinates is valid for the given movement type, and on the
+ * manager's board.
  */
 @FunctionalInterface
 interface Neighbors {
-    ArrayList<Movement.Node> getNeighbors(Movement.Node now,
-                                          ArrayList<Movement.Node> open, ArrayList<Movement.Node> closed,
-                                          BetaGameManager manager, EscapePiece piece);
+    boolean isNeighbor(BetaGameManager manager, int xChange, int yChange);
 }
 
 /**
@@ -50,13 +49,64 @@ interface Neighbors {
 public enum Movement implements MovePattern{
     ORTHOGONAL((piece, from, to, manager)->{
         if(manager.getCoordID() == CoordinateID.HEX ||
-                getPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
-                        Movement::addStandardNeighborsToOpenList) == null){
+                getAStarPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
+                        Movement::checkOrthoNeighbors) == null){
             return false; //false if on hex or no path found
         }
         return true;
     }),
+
     LINEAR((piece, from, to, manager)->{
+       return isLinearPath(piece, from, to, manager);
+    }),
+
+    DIAGONAL((piece, from, to, manager)->{
+        if(manager.getCoordID() != CoordinateID.SQUARE ||
+                getAStarPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
+                        Movement::checkDiagNeighbors) == null){
+            return false; //false if not on square or no path found
+        }
+        return true;
+    }),
+
+    OMNI((piece, from, to, manager)->{
+        return getAStarPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
+                Movement::checkOmniNeighbors) != null;
+    });
+
+    //The variable which holds a validity check function
+    private MovePattern movement;
+
+    /**
+     * Constructor for a  type of movement. This determines how the piece can move around the board
+     * @param pattern
+     */
+    Movement(MovePattern pattern){
+        movement = pattern;
+    }
+
+    /**
+     * Function which determines if a given move is valid. Returns the definition lambda assigned to the Movement
+     * @param piece the piece to move/check
+     * @param from the coordinate to move from
+     * @param to the coordinate to move to
+     * @return Boolean if the move is valid.
+     * @param manager the game manager
+     */
+    @Override
+    public boolean isValid(EscapePiece piece, Coordinate from, Coordinate to, BetaGameManager manager) {
+        return movement.isValid(piece, from, to, manager);
+    }
+
+    /**
+     * Determines if there is a direct, non-linear path to the to coordinate
+     * @param piece the piece being moved
+     * @param from the location to move the piece from
+     * @param to the location to moce the piece to
+     * @param manager the game manager
+     * @return boolean if move is possible for the given piece
+     */
+    public static boolean isLinearPath(EscapePiece piece, Coordinate from, Coordinate to, BetaGameManager manager){
         Coordinate2D start = (Coordinate2D)from;
         Coordinate2D end = (Coordinate2D)to;
         //If path is not along a single line at every point, then invalid linear move
@@ -106,42 +156,6 @@ public enum Movement implements MovePattern{
                 manager.getIntPieceAttribute(piece.getName(), FLY) :
                 manager.getIntPieceAttribute(piece.getName(), DISTANCE);
         return dist > loops;
-    }),
-    DIAGONAL((piece, from, to, manager)->{
-        if(manager.getCoordID() != CoordinateID.SQUARE ||
-                getPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
-                        Movement::addDiagonalNeighborsToOpenList) == null){
-            return false; //false if not on square or no path found
-        }
-        return true;
-    }),
-    OMNI((piece, from, to, manager)->{
-        return getPath(piece, (Coordinate2D)from, (Coordinate2D)to, manager,
-                Movement::addStandardNeighborsToOpenList) != null;
-    });
-
-    //The variable which hold a validity check function
-    private MovePattern movement;
-
-    /**
-     * Constructor for a  type of movement. This determines how the piece can move around the board
-     * @param pattern
-     */
-    Movement(MovePattern pattern){
-        movement = pattern;
-    }
-
-    /**
-     * Function which determines if a given move is valid. Returns the definition lambda assigned to the Movement
-     * @param piece the piece to move/check
-     * @param from the coordinate to move from
-     * @param to the coordinate to move to
-     * @return Boolean if the move is valid.
-     * @param manager the game manager
-     */
-    @Override
-    public boolean isValid(EscapePiece piece, Coordinate from, Coordinate to, BetaGameManager manager) {
-        return movement.isValid(piece, from, to, manager);
     }
 
     /**
@@ -152,8 +166,8 @@ public enum Movement implements MovePattern{
      * @param manager
      * @return A list of coordinates that is the shortest path. Null if no path found
      */
-    public static ArrayList<Coordinate2D>getPath(EscapePiece piece, Coordinate2D start, Coordinate2D end,
-                                                 BetaGameManager manager, Neighbors neighbors){
+    public static ArrayList<Coordinate2D> getAStarPath(EscapePiece piece, Coordinate2D start, Coordinate2D end,
+                                                       BetaGameManager manager, Neighbors neighbors){
         ArrayList<Node> open = new ArrayList<>();
         ArrayList<Node> closed = new ArrayList<>();
         ArrayList<Node> path = new ArrayList<>();
@@ -164,7 +178,7 @@ public enum Movement implements MovePattern{
         int yend = end.getY();
         Node now = new Node(null, xstart, ystart, 0, 0);
         closed.add(now);
-        open = neighbors.getNeighbors(now, open, closed, manager, piece);
+        open = addStandardNeighborsToOpenList(now, open, closed, manager, piece, neighbors);
         while (now.x != xend || now.y != yend) {
             if (open.isEmpty()) { // Nothing to examine, return null for no path
                 return null;
@@ -172,7 +186,7 @@ public enum Movement implements MovePattern{
             now = open.get(0); // get first node (lowest cost)
             open.remove(0); // remove it
             closed.add(now); // and add to the closed
-            open = neighbors.getNeighbors(now, open, closed, manager, piece);
+            open = addStandardNeighborsToOpenList(now, open, closed, manager, piece, neighbors);
         }
         path.add(0, now);
         while (now.x != xstart || now.y != ystart) {
@@ -201,7 +215,7 @@ public enum Movement implements MovePattern{
     }
 
     /**
-     * Adds neighbors to the openlist in the ASTAR check. For Otho and omni movement
+     * Adds neighbors to the openlist in the ASTAR check. For Ortho and omni movement
      * @param now the current node to check
      * @param open the current openlist
      * @param manager the game manager implementation
@@ -209,47 +223,14 @@ public enum Movement implements MovePattern{
      * @return the list of new neighbor nodes
      */
     public static ArrayList<Node> addStandardNeighborsToOpenList(Node now, ArrayList<Node> open, ArrayList<Node> closed,
-                                                                 BetaGameManager manager, EscapePiece piece) {
+                                                                 BetaGameManager manager, EscapePiece piece, Neighbors neighbors){
         Node node;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                if (shouldSkip(piece, manager, x, y)) {
-                    continue; // skip if diagonal movement is not allowed
-                }
-                node = new Node(now, now.x + x, now.y + y, now.g,
-                        manager.makeCoordinate(now.x, now.y).distanceTo(manager.makeCoordinate(x, y)));
-                if ((x != 0 || y != 0) // not "now" Node
-                        && checkBoundaries(now, x, y, manager) // check if board boundaries
-                        && isUNBLOCKED(piece, manager, now.x+x, now.y+y) // check if space is BLOCKed or has a piece
-                        && canJump(piece, now,now.x+x, now.y+y, manager) // check if jumpable
-                        && !findNeighborInList(open, node) && !findNeighborInList(closed, node)) { // if not already done
-                    node.g = node.parent.g + 1; // Add 1 to cost
-                    node.justJumped = hasPiece(now.x+x, now.y+y, manager);
-                    open.add(node);
-                }
-            }
-        }
-        Collections.sort(open);
-        return open;
-    }
-
-    /**
-     * Adds neighbors to the openlist in the ASTAR check. For Diagonal movement
-     * @param now the current node to check
-     * @param open the current openlist
-     * @param manager the game manager implementation
-     * @param piece the piece to evaluate for attributes
-     * @return
-     */
-    public static ArrayList<Node> addDiagonalNeighborsToOpenList(Node now, ArrayList<Node> open, ArrayList<Node> closed,
-                                                                   BetaGameManager manager, EscapePiece piece) {
-        Node node;
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                if (x != 0 && y != 0) { // Only check neighbors
+                if (neighbors.isNeighbor(manager, x, y)) { // Checking if neighbor is valid using lambda function
                     node = new Node(now, now.x + x, now.y + y, now.g,
                             manager.makeCoordinate(now.x, now.y).distanceTo(manager.makeCoordinate(x, y)));
-                    if ((x != 0 || y != 0) // not "now" Node (should always be true)
+                    if ((x != 0 || y != 0) // not "now" Node
                             && checkBoundaries(now, x, y, manager) // check if board boundaries
                             && isUNBLOCKED(piece, manager, now.x + x, now.y + y) // check if space is BLOCKed or has a piece
                             && canJump(piece, now, now.x + x, now.y + y, manager) // check if jumpable
@@ -264,6 +245,7 @@ public enum Movement implements MovePattern{
         Collections.sort(open);
         return open;
     }
+
 
     /**
      * Checks if the algorithm should consider boundaries when evaluating neighbors
@@ -282,22 +264,47 @@ public enum Movement implements MovePattern{
         return true;
     }
 
+
     /**
-     * Checks if the algorithm should skip over the x, y coordinate when checking neighbors
-     * @param piece the piece being moved
+     * Returns true if the change in x or y for the manager's board is valid.
+     * For orthogonal movement checking
      * @param manager the game manager
-     * @param x the x coordinate to move to
-     * @param y the y coordinate to move to
-     * @return
+     * @param xChange the x change in value
+     * @param yChange the y change in value
+     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
      */
-    public static boolean shouldSkip(EscapePiece piece, BetaGameManager manager, int x, int y){
+    public static boolean checkOrthoNeighbors(BetaGameManager manager, int xChange, int yChange){
         if(!(manager.getBoard() instanceof BoundedBoard)){
-            return x == y && x != 0;
+            return xChange == yChange && xChange != 0;
         }
+        return !(xChange != 0 && yChange != 0);
+    }
+
+    /**
+     * Returns true if the change in x or y for the manager's board is valid.
+     * For diagonal movement checking
+     * @param manager the game manager
+     * @param xChange the x change in value
+     * @param yChange the y change in value
+     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
+     */
+    public static boolean checkDiagNeighbors(BetaGameManager manager, int xChange, int yChange){
+        return xChange != 0 && yChange != 0;
+    }
+
+    /**
+     * Returns true if the change in x or y for the manager's board is valid.
+     * For omni movement checking
+     * @param manager the game manager
+     * @param xChange the x change in value
+     * @param yChange the y change in value
+     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
+     */
+    public static boolean checkOmniNeighbors(BetaGameManager manager, int xChange, int yChange){
         if((manager.getBoard() instanceof OrthoSquareBoard)){
-            return  x != 0 && y != 0;
+            return  checkOrthoNeighbors(manager, xChange, yChange);
         }
-        return (manager.getPieceMovePattern(piece.getName()) == ORTHOGONAL && x != 0 && y != 0);
+        return true;
     }
 
     /**
