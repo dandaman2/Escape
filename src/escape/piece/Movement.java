@@ -271,7 +271,7 @@ public enum Movement implements MovePattern{
      * @param manager the game manager
      * @param xChange the x change in value
      * @param yChange the y change in value
-     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
+     * @return a boolean which determines if the x and y changes are valid neighbors, assuming a (0,0)->(xChange, yChange) start
      */
     public static boolean checkOrthoNeighbors(BetaGameManager manager, int xChange, int yChange){
         if(!(manager.getBoard() instanceof BoundedBoard)){
@@ -286,7 +286,7 @@ public enum Movement implements MovePattern{
      * @param manager the game manager
      * @param xChange the x change in value
      * @param yChange the y change in value
-     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
+     * @return a boolean which determines if the x and y changes are valid neighbors, assuming a (0,0)->(xChange, yChange) start
      */
     public static boolean checkDiagNeighbors(BetaGameManager manager, int xChange, int yChange){
         return xChange != 0 && yChange != 0;
@@ -298,7 +298,7 @@ public enum Movement implements MovePattern{
      * @param manager the game manager
      * @param xChange the x change in value
      * @param yChange the y change in value
-     * @return a boolean which determines if the x and y changes are valid from, assuming a (0,0)->(xChange, yChange) start
+     * @return a boolean which determines if the x and y changes are valid neighbors, assuming a (0,0)->(xChange, yChange) start
      */
     public static boolean checkOmniNeighbors(BetaGameManager manager, int xChange, int yChange){
         if((manager.getBoard() instanceof OrthoSquareBoard)){

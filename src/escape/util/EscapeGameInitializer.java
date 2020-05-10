@@ -15,6 +15,7 @@ package escape.util;
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 import escape.board.coordinate.CoordinateID;
+import escape.rule.Rule;
 
 /**
  * An example of reading a game configuration file and the board and piece
@@ -32,6 +33,9 @@ public class EscapeGameInitializer
 	
 	// Piece items
 	private PieceTypeInitializer[] pieceTypes; 	// At least one
+
+	//The rules defined for the game
+	private Rule[] rules;
     
     public EscapeGameInitializer()
     {
@@ -118,6 +122,18 @@ public class EscapeGameInitializer
 		this.pieceTypes = types;
 	}
 
+	/**
+	 * For setting the game rules from the config file
+	 * @param rules
+	 */
+	public void setRules(Rule ... rules){ this.rules = rules; }
+
+	/**
+	 * Gets the array of rules
+	 * @return the array of rules
+	 */
+	public Rule[] getRules() { return rules; }
+
 	/*
 	 * @see java.lang.Object#toString()
 	 */
@@ -125,8 +141,9 @@ public class EscapeGameInitializer
 	public String toString()
 	{
 		return "EscapeGameInitializer [xMax=" + xMax + ", yMax=" + yMax
-		    + ", coordinateType=" + coordinateType + ", locationInitializers="
-		    + Arrays.toString(locationInitializers) + ", types="
+		    + ", coordinateType=" + coordinateType + ", rules="
+			+ Arrays.toString(rules) + ", locationInitializers="
+			+ Arrays.toString(locationInitializers) + ", types="
 		    + Arrays.toString(pieceTypes) + "]";
 	}
 	

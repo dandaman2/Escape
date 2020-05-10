@@ -21,5 +21,15 @@ package escape;
  */
 public interface GameObserver
 {
-    
+    /**
+     * Receive a message from the game
+     * @param message
+     */
+    void notify(String message);
+    /**
+     * Receive a message with the cause
+     * @param message
+     * @param cause
+     */
+    void notify(String message, Throwable cause);
 }

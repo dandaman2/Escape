@@ -25,6 +25,7 @@ import escape.board.coordinate.*;
 import escape.exception.EscapeException;
 import escape.piece.EscapePiece;
 import escape.piece.MovementPatternID;
+import escape.rule.Rule;
 import escape.util.EscapeGameInitializer;
 import escape.util.LocationInitializer;
 import escape.util.PieceTypeInitializer;
@@ -85,11 +86,18 @@ public class EscapeGameBuilder
                         (HexCoordinate::makeCoordinate));
                 break;
             default:
-                throw new EscapeException("Coordinate type not recognized");
+                throw new EscapeException("Coordinate type not specified or recognized");
         }
 
         //Set the Coordinate ID
         manager.setCoordID(gameInitializer.getCoordinateType());
+
+        //iterate through rules and add them to the game manager
+        if(gameInitializer.getRules() != null){
+            for(Rule rule: gameInitializer.getRules()){
+                // TODO: 5/9/2020 Add rules to game manager
+            }
+        }
 
         //Iterate through pieces, adding movement patterns and attributes
         if(gameInitializer.getPieceTypes() != null){
