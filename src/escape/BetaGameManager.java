@@ -37,7 +37,6 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
     //The static function which generates coordinates for the given board type.
     private BiFunction<Integer, Integer, C> makeCoordinate = null;
 
-
     //A hashmap which holds the movement patterns and attributes for a given piece
     private HashMap<PieceName, PieceData> pieceData = new HashMap<PieceName, PieceData>();
 

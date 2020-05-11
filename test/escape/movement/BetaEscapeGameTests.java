@@ -10,7 +10,7 @@
  * Copyright ©2020 Gary F. Pollice
  *******************************************************************************/
 
-package escape;
+package escape.movement;
 
 import static escape.piece.PieceAttributeID.*;
 import static escape.piece.PieceName.*;
@@ -19,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.util.stream.Stream;
 
+import escape.BetaGameManager;
+import escape.EscapeGameBuilder;
+import escape.EscapeGameManager;
 import escape.board.HexBoard;
 import escape.board.LocationType;
 import escape.board.OrthoSquareBoard;
@@ -48,7 +51,7 @@ class BetaEscapeGameTests
      */
     @Test
     void notNullBuilderTest() throws Exception {
-        EscapeGameBuilder egb 
+        EscapeGameBuilder egb
             = new EscapeGameBuilder(new File("config/game/SampleEscapeGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
         System.out.println(egb.getGameInitializer());

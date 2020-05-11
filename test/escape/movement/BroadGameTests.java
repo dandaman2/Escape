@@ -1,5 +1,6 @@
-package escape;
+package escape.movement;
 
+import escape.*;
 import escape.exception.EscapeException;
 import escape.piece.PieceName;
 import escape.piece.Player;
