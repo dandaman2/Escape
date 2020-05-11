@@ -51,3 +51,10 @@ Beta:
     When finding errors during parsing, an EscapeException is thrown from the gameBuilder. This would occur when reading
     a diagonally moving piece onto a hex board, for example. All other validity tests are done at the start of a piece's
     movement, which includes the functionality of physically moving/removing the pieces.
+
+Gamma:
+    Based on the feedback from the Beta release, I decided to refactor code within the movement class. Because there was
+    more variability in the boolean check of valid neighbors during the AStar versus the method by which neighbors are gathered,
+    The Neighbors functional interface method was changed to a boolean method, taking in only the relative change in x and y.
+    The AStar implementation in the movement class (As well as all the movement validity checks during the AStar process)
+    were moved to the Pathfinding class the avoid clutter and separate the movement helpers from the Enum definitions.

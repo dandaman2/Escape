@@ -97,6 +97,7 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
         //Get the moveset from the piece data and evaluate
         PieceData p = pieceData.get(piece.getName());
         Movement m = p.getMovePattern();
+        //System.out.println("starting move check");
         if(m.isValid(piece, from, to, this)){
 
             //Remove enemy piece if captured

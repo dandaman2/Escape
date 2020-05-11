@@ -33,6 +33,7 @@ import escape.board.coordinate.SquareCoordinate;
 import escape.exception.EscapeException;
 import escape.piece.EscapePiece;
 import escape.piece.Movement;
+import escape.piece.Pathfinding;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -251,7 +252,7 @@ class BetaEscapeGameTests
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
-        assertFalse(Movement.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, FROG), (BetaGameManager)emg, 5, 6));
+        assertFalse(Pathfinding.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, FROG), (BetaGameManager)emg, 5, 6));
 
     }
 
@@ -261,7 +262,7 @@ class BetaEscapeGameTests
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/game/SquareGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
-        assertTrue(Movement.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, HORSE), (BetaGameManager)emg, 5, 6));
+        assertTrue(Pathfinding.isUNBLOCKED(EscapePiece.makePiece(PLAYER1, HORSE), (BetaGameManager)emg, 5, 6));
     }
 
 
