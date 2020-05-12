@@ -26,6 +26,7 @@ import escape.exception.EscapeException;
 import escape.piece.EscapePiece;
 import escape.piece.MovementPatternID;
 import escape.rule.Rule;
+import escape.rule.RuleID;
 import escape.util.EscapeGameInitializer;
 import escape.util.LocationInitializer;
 import escape.util.PieceTypeInitializer;
@@ -96,6 +97,10 @@ public class EscapeGameBuilder
             for(Rule rule: gameInitializer.getRules()){
                 manager.addRule(rule.getId(), rule.getIntValue());
             }
+        }
+        //Should throw an error if two different capturing rules are defined
+        if(manager.hasRule(RuleID.REMOVE) && manager.hasRule(RuleID.POINT_CONFLICT)){
+            throw new EscapeException("Cannot have both REMOVE and POINT_CONFLICT defined");
         }
 
         //Iterate through pieces, adding movement patterns and attributes

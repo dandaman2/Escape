@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <escapeGameInitializer>
 	<coordinateType>HEX</coordinateType>
-    <!-- Board items -->
+    <!-- Board items and rules -->
+    <rules>
+        <id>REMOVE</id>
+    </rules>
     <!--Max and min ignored for hex board-->
     <xMax>20</xMax>
     <yMax>25</yMax>

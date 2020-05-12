@@ -47,7 +47,7 @@ Dan Duff Final (Gamma) Release
     6. Player order is correct player 1 -> player 2
         (StaringSquareGame)
         EGM.move((3, 3)->(3, 8)) : True
-        EGM.move((3, 8)->(3, 3)): False // player 1 shouldnt move twice
+        EGM.move((3, 8)->(3, 3)): False // player 1 shouldn't move twice
 
         EGM.addObserver(TestObserver)
         EGM.move((10, 3)->(11, 3)) : False // player 1 goes first
@@ -64,4 +64,74 @@ Dan Duff Final (Gamma) Release
         EGM.move((3, 6)->(3, 7)): False // Turn limit reached
 
 
- todo write tests for completing game in score limit (p1 should win on move after final p2 move)
+8. Implement winning condition by reaching score
+    (StartingSquareGame) (Score Limit 10)
+    EGM.addObserver(TestObserver)
+    EGM.move((19, 19)->(19, 18)): True // HORSE(5) EXIT
+    EGM.move((10, 3)->(13, 3)): True // SNAIL(1) EXIT
+    EGM.move((3, 3)->(3, 6)): True // HORSE(5) EXIT
+    EGM.move((18, 18)->(17, 16)): True
+    TestObserver.gotError : True //PLAYER1 WINS
+    EGM.move((1, 1)->(1, 2)): False //PLAYER1 Already won
+
+    EGM.addObserver(TestObserver)
+    EGM.move((3, 17)->(2, 19)): True // SNAIL(1) EXIT
+    EGM.move((1, 19)->(2, 19)): True // HORSE(5) EXIT
+    EGM.move((3, 3)->(3, 6)): True // HORSE(5) EXIT
+    EGM.move((1, 18)->(2, 19)): True //HORSE(5) EXIT
+    TestObserver.gotError : True //PLAYER2 WINS
+    EGM.move((1, 1)->(1, 2)): False //PLAYER2 Already won
+
+    9. Tying condition should be checked at the end of the turn limit
+        (StartingSquareGame): TURN_LIMIT: 3 EXIT @ (13, 3), (14, 1) (Score Limit 10)
+        EGM.move((3, 3)->(3, 4)->(3, 5)): True
+        EGM.move((14, 2)->(14, 1)): True
+        EGM.move((10, 3)->(11, 3)->(12, 3)->(13, 3): True
+        EGM.move((3, 6)->(3, 7)): False // Turn limit reached and tied
+
+        EGM.move((19, 19)->(19, 18)): True // HORSE(5) EXIT
+        EGM.move((1, 19)->(2, 19)): True // HORSE(5) EXIT
+        EGM.move((3, 3)->(3, 6)): True // HORSE(5) EXIT
+        EGM.move((1, 18)->(2, 19)): True //HORSE(5) EXIT
+        TestObserver.gotError : True //Tie in score
+        EGM.move((1, 1)->(1, 2)): False //Game already ended in a tie
+
+10. Add rules and mutual exclusivity to REMOVE and POINT_CONFLICT
+    11. REMOVE simply removes the captured pieces on the board, regardless of value
+        (StartingSquareGame)
+        EGM.move((19, 19)->(18, 18)): True
+        EGM.getPieceAt((18, 18)): HORSE - PLAYER1 - Value 5: True
+
+        EGM.move((14, 2)->(14, 4)): True
+        EGM.move((18, 18)->(19, 19)): True
+        EGM.getPieceAt(19, 19): SNAIL - PLAYER2 - Value 1: True
+
+    12. POINTS_CONFLICT Reduces the higher score, and removes the lower-score piece
+        (StartingOrthoGame) EXIT @ (3, 6), (2, 2)
+        EGM.move((1, 1)->(2, 1)): True
+        EGM.getPieceAt((2, 1)): HORSE - PLAYER1 - Value 4: True //value was reduced by 1
+        EGM.move((5, 6)->(3, 6)): True // HORSE 5 on EXIT
+        EGM.move((2, 1)->(2, 2)): True // HORSE 4 on EXIT
+        BGM.getPlayerScore(PLAYER1) == 4: Equals
+        BGM.getPlayerScore(PLAYER2) == 5: Equals
+
+        EGM.move((15, 16)->(17, 16)): True
+        EGM.move((2, 1)->(1, 1)): True
+        EGM.getPieceAt(2, 1): Null
+        EGM.getPieceAt(1, 1): HORSE - PLAYER1 - Value 4: True //value was reduced by 1
+
+        EGM.move((15, 16)->(12, 16)): True //both are equal value, so both get removed
+        EGM.getPieceAt(15, 16): Null
+        EGM.getPieceAt(12, 16): Null
+
+        13. Game cannot be built if both POINTS_CONFLICT and REMOVE are defined
+            egb.makeGameManager(InvalidOrthoGame): Throws Exception
+
+        14. If neither POINTS_CONFLICT or REMOVE are defined, no piece can be capture
+           (NoCaptureOrthoGame)
+           EGM.move((1, 1)->(2, 1)): False //Should not pass if no capture rules defined
+
+15. Same player can move twice if first move failed
+    (NoCaptureOrthoGame)
+    EGM.move((1, 1)->(2, 1)): False //Should not pass if no capture rules defined
+    EGM.move((1, 1)->(1, 2)): True //Should pass because previous move failed

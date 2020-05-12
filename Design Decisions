@@ -58,3 +58,7 @@ Gamma:
     The Neighbors functional interface method was changed to a boolean method, taking in only the relative change in x and y.
     The AStar implementation in the movement class (As well as all the movement validity checks during the AStar process)
     were moved to the Pathfinding class the avoid clutter and separate the movement helpers from the Enum definitions.
+
+    GameObservers were a new addition to the final Escape release, however an implementation was not required for submission.
+    For testing purposes a TestGameObserver class was created. This implementation's notify methods simply print the error to
+    System.out, and have the gotError boolean variable set (as a way to check if anything was received during tests)

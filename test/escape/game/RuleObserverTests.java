@@ -14,6 +14,7 @@ package escape.game;
 
 import escape.*;
 import escape.exception.EscapeException;
+import escape.piece.EscapePiece;
 import escape.piece.PieceName;
 import escape.piece.Player;
 import escape.rule.RuleID;
@@ -37,7 +38,8 @@ public class RuleObserverTests {
         EscapeGameBuilder egb
                 = new EscapeGameBuilder(new File("config/full_games/StartingHexGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
-        //System.out.println(egb.getGameInitializer());
+        //for toString coverage
+        egb.getGameInitializer();
         boolean found = false;
         for (int i = 0; i < egb.getGameInitializer().getRules().length; i++) {
             if (egb.getGameInitializer().getRules()[i].getId() == RuleID.SCORE) {
@@ -227,6 +229,248 @@ public class RuleObserverTests {
         //invalid 4th turn
         assertFalse(emg.move(emg.makeCoordinate(3, 6), emg.makeCoordinate(3, 7)));
     }
+
+    //SCORE REACHED////////////////////////////////////////////////////////////////////////////////////
+
+    //Test to ensure that if player 1 reaches the correct score, player 2 should go before the end of the turn and game
+    @Test
+    void scoreReachedPlayer1Test() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //turn 1
+        assertTrue(emg.move(emg.makeCoordinate(19, 19), emg.makeCoordinate(19, 18)));
+        assertTrue(emg.move(emg.makeCoordinate(10, 3), emg.makeCoordinate(13, 3)));
+
+        //turn 2
+        assertTrue(emg.move(emg.makeCoordinate(3, 3), emg.makeCoordinate(3, 6))); // Player 1 wins here
+        assertTrue(emg.move(emg.makeCoordinate(18, 18), emg.makeCoordinate(17, 16)));
+
+        assertTrue(obs.gotError); //PLAYER 1 WINS
+
+        assertFalse(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(1, 2)));
+    }
+
+    //Tests to make sure that player 2 wins if it meets the point value
+    @Test
+    void scoreReachedPlayer2Test() throws Exception{
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //turn 1
+        assertTrue(emg.move(emg.makeCoordinate(3, 17), emg.makeCoordinate(2, 19)));
+        assertTrue(emg.move(emg.makeCoordinate(1, 19), emg.makeCoordinate(2, 19)));
+
+        //turn 2
+        assertTrue(emg.move(emg.makeCoordinate(3, 3), emg.makeCoordinate(3, 6)));
+        assertTrue(emg.move(emg.makeCoordinate(1, 18), emg.makeCoordinate(2, 19)));
+
+        assertTrue(obs.gotError); //PLAYER 2 WINS
+
+        assertFalse(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(1, 2)));
+    }
+
+    //Checks to make sure that a tying condition is met at the end of the turn limit if scores are identical
+    @Test
+    void tiesAtTurnLimitTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //turn 1
+        assertTrue(emg.move(emg.makeCoordinate(3, 3), emg.makeCoordinate(3, 4)));
+        assertTrue(emg.move(emg.makeCoordinate(10, 3), emg.makeCoordinate(11, 3)));
+
+        //turn 2
+        assertTrue(emg.move(emg.makeCoordinate(3, 4), emg.makeCoordinate(3, 5)));
+        assertTrue(emg.move(emg.makeCoordinate(11, 3), emg.makeCoordinate(12, 3)));
+
+        //turn 3
+        assertTrue(emg.move(emg.makeCoordinate(14, 2), emg.makeCoordinate(14, 3)));
+        assertTrue(emg.move(emg.makeCoordinate(12, 3), emg.makeCoordinate(13, 3)));
+
+        //invalid 4th turn
+        assertFalse(emg.move(emg.makeCoordinate(3, 6), emg.makeCoordinate(3, 7)));
+    }
+
+    //Checks to make sure that a tying condition is met if scores are identical at the win condition
+    @Test
+    void tiesAtScoreLimitTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //turn 1
+        assertTrue(emg.move(emg.makeCoordinate(19, 19), emg.makeCoordinate(19, 18)));
+        assertTrue(emg.move(emg.makeCoordinate(1, 19), emg.makeCoordinate(2, 19)));
+
+        //turn 2
+        assertTrue(emg.move(emg.makeCoordinate(3, 3), emg.makeCoordinate(3, 6)));
+        assertTrue(emg.move(emg.makeCoordinate(1, 18), emg.makeCoordinate(2, 19)));
+        assertTrue(obs.gotError); // game is over
+
+        assertFalse(emg.move(emg.makeCoordinate(3, 6), emg.makeCoordinate(3, 7))); // game ended in a tie
+    }
+
+
+    //REMOVE RULE////////////////////////////////////////////////////////////////////////////////////
+    //Test to ensure that REMOVE simply removes the captured pieces on the board, regardless of value
+    @Test
+    void player1RemoveTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+
+        assertTrue(emg.move(emg.makeCoordinate(19, 19), emg.makeCoordinate(18, 18)));
+        assertNull(emg.getPieceAt(emg.makeCoordinate(19, 19)));
+        EscapePiece piece  = emg.getPieceAt(emg.makeCoordinate(18, 18));
+
+        assertEquals(piece.getName(), PieceName.HORSE);
+        assertEquals(piece.getPlayer(), PLAYER1);
+        assertEquals(piece.getValue(), 5);
+    }
+
+    //Test to ensure that REMOVE simply removes the captured pieces on the board, regardless of value
+    @Test
+    void player2RemoveTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingSquareGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+
+        assertTrue(emg.move(emg.makeCoordinate(14, 2), emg.makeCoordinate(14, 4)));
+        assertTrue(emg.move(emg.makeCoordinate(18, 18), emg.makeCoordinate(19, 19)));
+
+        assertNull(emg.getPieceAt(emg.makeCoordinate(18, 18)));
+        EscapePiece piece  = emg.getPieceAt(emg.makeCoordinate(19, 19));
+
+        assertEquals(piece.getName(), PieceName.SNAIL);
+        assertEquals(piece.getPlayer(), PLAYER2);
+        assertEquals(piece.getValue(), 1);
+    }
+
+    //POINTS_CONFLICT//////////////////////////////////////////////////////////////////////////////
+    //Test to ensure that POINTS_CONFLICT reduces the higher score and removes the piece with the lower score
+    @Test
+    void higherToLowerPointConflictTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingOrthoGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+
+        assertTrue(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(2, 1)));
+        assertNull(emg.getPieceAt(emg.makeCoordinate(1, 1)));
+
+        EscapePiece piece  = emg.getPieceAt(emg.makeCoordinate(2, 1));
+        assertEquals(piece.getName(), PieceName.HORSE);
+        assertEquals(piece.getPlayer(), PLAYER1);
+        assertEquals(piece.getValue(), 4);
+
+        assertTrue(emg.move(emg.makeCoordinate(5, 6), emg.makeCoordinate(3, 6)));
+        assertTrue(emg.move(emg.makeCoordinate(2, 1), emg.makeCoordinate(2, 2)));
+
+        assertEquals(((BetaGameManager) emg).getPlayerScore(PLAYER1), 4);
+        assertEquals(((BetaGameManager) emg).getPlayerScore(PLAYER2), 5);
+    }
+
+    //Test to ensure that POINTS_CONFLICT reduces the higher score and removes the piece with the lower score
+    @Test
+    void lowerToHigherPointConflictTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingOrthoGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+
+        assertTrue(emg.move(emg.makeCoordinate(15, 16), emg.makeCoordinate(17, 16)));
+        assertTrue(emg.move(emg.makeCoordinate(2, 1), emg.makeCoordinate(1, 1)));
+        assertNull(emg.getPieceAt(emg.makeCoordinate(2, 1)));
+
+        EscapePiece piece  = emg.getPieceAt(emg.makeCoordinate(1, 1));
+        assertEquals(piece.getName(), PieceName.HORSE);
+        assertEquals(piece.getPlayer(), PLAYER1);
+        assertEquals(piece.getValue(), 4);
+    }
+
+    //Test to make sure that conflicting pieces with the same value are both removed
+    @Test
+    void sameValuePointConflictTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/StartingOrthoGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        assertTrue(emg.move(emg.makeCoordinate(15, 16), emg.makeCoordinate(12, 16)));
+        assertNull(emg.getPieceAt(emg.makeCoordinate(15, 16)));
+        assertNull(emg.getPieceAt(emg.makeCoordinate(12, 16)));
+
+    }
+
+    //An error should be thrown if both POINTS_CONFLICT and REMOVE are defined
+    @Test
+    void noRemoveAndConflictTest() throws Exception {
+        assertThrows(EscapeException.class, ()->{
+            EscapeGameBuilder egb
+                    = new EscapeGameBuilder(new File("config/full_games/InvalidOrthoGame.xml"));
+            EscapeGameManager emg = egb.makeGameManager();
+            TestGameObserver obs = new TestGameObserver();
+        });
+    }
+
+    //Pieces should not be captured if REMOVE or POINTS_CONFLICT is not defined
+    @Test
+    void noRemovalTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/NoCaptureOrthoGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //Fail on capture
+        assertFalse(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(2, 1)));
+        assertNotNull(emg.getPieceAt(emg.makeCoordinate(2, 1)));
+        assertNotNull(emg.getPieceAt(emg.makeCoordinate(1, 1)));
+
+    }
+
+    //If a move fails, the player should still have their turn until a valid move is made
+    @Test
+    void noTurnChangeOnFailTest() throws Exception {
+        EscapeGameBuilder egb
+                = new EscapeGameBuilder(new File("config/full_games/NoCaptureOrthoGame.xml"));
+        EscapeGameManager emg = egb.makeGameManager();
+        TestGameObserver obs = new TestGameObserver();
+        emg.addObserver(obs);
+
+        //Fail on capture
+        assertFalse(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(2, 1)));
+        assertNotNull(emg.getPieceAt(emg.makeCoordinate(2, 1)));
+        assertNotNull(emg.getPieceAt(emg.makeCoordinate(1, 1)));
+
+        //should pass now
+        assertTrue(emg.move(emg.makeCoordinate(1, 1), emg.makeCoordinate(1, 2)));
+
+    }
+
 
 }
 

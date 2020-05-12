@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <escapeGameInitializer>
 	<coordinateType>SQUARE</coordinateType>
-    <!-- Board items -->
+    <!-- Board items  and rules-->
+    <rules>
+        <id>REMOVE</id>
+    </rules>
     <xMax>20</xMax>
     <yMax>25</yMax>
     <locationInitializers> <!-- An array of these, 0 or more -->

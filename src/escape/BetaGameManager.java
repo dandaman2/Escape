@@ -50,11 +50,8 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
     //The current player's turn.
     private Player currentPlayer = Player.PLAYER1;
 
-    //The message to play once the game has ended
-    String endMessage = "";
-
-    //A boolean to determine the location in the turn
-    private boolean player1Went = false;
+    //The message to play once the game has ended. Indicates game-over when set
+    String endMessage = null;
 
     //Hashmap which stores player score
     private HashMap<Player, Integer> scores = new HashMap<Player, Integer>();
@@ -62,8 +59,6 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
     //The Current number of turns. If -1, then there is no turn limit
     private int turnsTillEnd = -1;
 
-    //A boolean to determine if the game has already ended
-    private boolean alreadyWon = false;
 
     /**
      * The default constructor for creating the game manager
@@ -89,7 +84,7 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
      */
     private void nextAction(){
         //Send of the turn
-        if(this.player1Went) {
+        if(currentPlayer == Player.PLAYER2) {
             if (this.turnsTillEnd > 0) {
                 this.turnsTillEnd--;
             }
@@ -98,7 +93,18 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
                     (hasRule(RuleID.SCORE) &&
                             (getPlayerScore(Player.PLAYER1) >= getRuleValue(RuleID.SCORE))||
                             (getPlayerScore(Player.PLAYER2) >= getRuleValue(RuleID.SCORE)))){
+
+                //Compare to see higher score
                 int compare = Integer.compare(getPlayerScore(Player.PLAYER1), getPlayerScore(Player.PLAYER2));
+
+                //If both players make it to/over score limit, then tie
+                if(hasRule(RuleID.SCORE)&&
+                        (getPlayerScore(Player.PLAYER1) >= getRuleValue(RuleID.SCORE))&&
+                        (getPlayerScore(Player.PLAYER2) >= getRuleValue(RuleID.SCORE))){
+                    compare = 0;
+                }
+
+                //Select correct outcome based on score at end
                 switch (compare){
                     case -1:
                         notifyAll("PLAYER2 wins");
@@ -112,13 +118,13 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
                         notifyAll("PLAYER1 wins");
                         endMessage = "Game is over and PLAYER1 has won";
                         break;
+                    default:
+                        //Should never reach here, but just in-case
+                        notifyAll("The game has ended in a Tie!");
+                        endMessage = "The game is over and ended in a tie!";
+                        break;
                 }
-                alreadyWon = true;
             }
-
-            this.player1Went = false;
-        }else{
-            this.player1Went = true;
         }
         nextPlayer();
     }
@@ -215,9 +221,8 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
         try {
 
             //Return false if game is over
-            if(alreadyWon){
-                notifyAll(endMessage);
-                return false;
+            if(endMessage != null){
+                return falseAndNotify(endMessage);
             }
 
             //Find the moveset for the piece in the from coordinate
@@ -226,24 +231,28 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
 
             //Return false if no piece on moving location or ending location is a block
             if (piece == null) {
-                notifyAll("No piece chosen to move (no piece at starting location)");
-                return false; //no piece found at that location and cannot move to BLOCK location
+                //no piece found at that location and cannot move to BLOCK location
+                return falseAndNotify("No piece chosen to move (no piece at starting location)");
             }
 
+            //Return false if the piece being moved is not owned by the moving player
             if(piece.getPlayer() != currentPlayer){
-                notifyAll("The piece being moved does not belong to " + currentPlayer.name());
-                return false;
+                return falseAndNotify("The piece being moved does not belong to " + currentPlayer.name());
             }
 
+            //Return false if attempting to move onto a BLOCK location
             if(gameBoard.getLocationType(to) == LocationType.BLOCK){
-                notifyAll("Cannot move to a BLOCK location");
-                return false;
+                return falseAndNotify("Cannot move to a BLOCK location");
             }
 
             //Return false if the location being moved to has a piece of the same player
             if (capturedPiece != null && capturedPiece.getPlayer() == piece.getPlayer()) {
-                notifyAll("Cannot capture a piece belonging to the moving player");
-                return false;
+                return falseAndNotify("Cannot capture a piece belonging to the moving player");
+            }
+
+            //return false if the attempting to move onto a piece with no capturing rules
+            if(capturedPiece != null && (!hasRule(RuleID.REMOVE) && !hasRule(RuleID.POINT_CONFLICT))){
+                return falseAndNotify("Cannot capture a piece with no capturing rules defined (REMOVE, POINT_CONFLICT)");
             }
 
             //Get the moveset from the piece data and evaluate
@@ -252,13 +261,34 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
             //System.out.println("starting move check");
             if (m.isValid(piece, from, to, this)) {
 
-                //Remove enemy piece if captured
+                //Enemy capture logic
                 if (capturedPiece != null) {
-                    gameBoard.removePieceAt(to);
-                }
+                    if(hasRule(RuleID.POINT_CONFLICT)){ //For POINTS_CONFLICT Rule
+                        int movingPieceValue = piece.getValue();
+                        int enemyPieceValue = capturedPiece.getValue();
+                        int compare = Integer.compare(movingPieceValue, enemyPieceValue);
+                        switch (compare){
+                            case -1: //movingPiece value is lower
+                                gameBoard.removePieceAt(from);
+                                capturedPiece.setValue(enemyPieceValue-movingPieceValue);
+                                break;
+                            case 0: // both are the same value
+                                gameBoard.removePieceAt(from);
+                                gameBoard.removePieceAt(to);
+                                break;
+                            case 1: //enemy piece value is lower
+                                gameBoard.putPieceAt(gameBoard.removePieceAt(from), to);
+                                piece.setValue(movingPieceValue-enemyPieceValue);
+                                break;
+                        }
 
+                    } else{ // For REMOVE Rule
+                        gameBoard.putPieceAt(gameBoard.removePieceAt(from), to);
+                    }
+
+                }
                 //remove current piece if exit
-                if (gameBoard.getLocationType(to) == LocationType.EXIT) {
+                else if (gameBoard.getLocationType(to) == LocationType.EXIT) {
                     addToScore(currentPlayer, piece.getValue());
                     gameBoard.removePieceAt(from);
                 }else{
@@ -270,13 +300,22 @@ public class BetaGameManager<C extends Coordinate> implements EscapeGameManager<
                 nextAction();
                 return true;
             }
-            notifyAll("No path in-range or within movement type");
-            return false;
+            return falseAndNotify("No path in-range or within movement type");
 
         }catch(EscapeException exception){
             notifyAll(exception.getMessage(), exception);
             return false;
         }
+    }
+
+    /**
+     * Helper method that returns false, and notifies all observers of the cause
+     * @param message the message ot send to the observers
+     * @return false
+     */
+    public boolean falseAndNotify(String message){
+        notifyAll(message);
+        return false;
     }
 
     /**
