@@ -1,2 +1,67 @@
 Dan Duff Final (Gamma) Release
 1. Add Parsing for rules
+    StartingGame.getRules() contains SCORE: True
+    StartingGame.getRules() contains TURN_LIMIT: False
+
+    2. Use helper methods for obtaining and checking rule values
+        StartingGame.hasRule(SCORE): True
+        StartingGame.hasRule(TURN_LIMIT): False
+        StartingGame.getRuleValue(SCORE): 10
+        StartingGame.getRuleValue(REMOVE): 0
+
+
+3. Add observer implementation
+    (StartingHexGame)
+    EGM.addObserver(TestObserver)
+    EGM.move((5, -3)->(5, -1)): True
+    TestObserver.gotError : False
+
+    EGM.addObserver(TestObserver)
+    EGM.move((5, -3)->(5, 5)): False //Outside movement range
+    TestObserver.gotError: True
+
+    EGM.addObserver(TestObserver)
+    EGM.move((5, -3)->(5, -4)): False //Moving onto BLOCK location
+    TestObserver.gotError: True
+
+    EGM.addObserver(TestObserver)
+    EGM.move((0, 0)->(1, 1)): False // No piece at location
+    TestObserver.gotError: True
+
+    EGM.addObserver(TestObserver)
+    EGM.move((2, 0)->(3, 0)): False // Cannot capture piece of the moving player
+    TestObserver.gotError: True
+
+4. Add Scores to players/pieces (Default value is 1)
+    (StartingSquareGame)
+    BetaGM.getPlayerScore(PLAYER1) == 0: Equals
+    BetaGM.move((19, 19)->(19, 18)): True
+    BetaGM.getPlayerScore(PLAYER1) == 5: Equals
+
+    BetaGM.getPlayerScore(PLAYER2) == 0: Equals
+    BetaGM.move((19, 19)->(19, 18)): True
+    BetaGM.move((18, 18)->(19, 18)): True
+    BetaGM.getPlayerScore(PLAYER2) == 1: Equals
+
+5. Implement TURN_LIMIT and player turn order
+    6. Player order is correct player 1 -> player 2
+        (StaringSquareGame)
+        EGM.move((3, 3)->(3, 8)) : True
+        EGM.move((3, 8)->(3, 3)): False // player 1 shouldnt move twice
+
+        EGM.addObserver(TestObserver)
+        EGM.move((10, 3)->(11, 3)) : False // player 1 goes first
+        TestObserver.gotError : True
+
+        EGM.move((3, 3)->(3, 8)): True
+        EGM.move((10, 3)->(11, 3)): True
+        EGM.move((3, 8)->(3, 9)): True
+
+    7. TURN_LIMIT is set and followed
+        (StartingSquareGame): TURN_LIMIT: 3 EXIT @ (3, 6)
+        EGM.move((3, 3)->(3, 6)) (By 1 each turn): True
+        EGM.move((10, 3)->(13, 3) (By 1 each turn): True
+        EGM.move((3, 6)->(3, 7)): False // Turn limit reached
+
+
+ todo write tests for completing game in score limit (p1 should win on move after final p2 move)

@@ -25,7 +25,7 @@ import java.util.HashMap;
 public class EscapePiece{
     private final PieceName name;
     private final Player player;
-
+	private int value = 1;
     
     /**
      * Constructor that takes the player and piece name.
@@ -50,6 +50,16 @@ public class EscapePiece{
 		return new EscapePiece(player, name);
 	}
 
+	/**
+	 * Sets the individual piece's value
+	 * @param val the value to set
+	 */
+	public void setValue(int val){ this.value = val; }
+
+	/**
+	 * Gets the individual piece's value
+	 */
+	public int getValue(){ return this.value; }
 
 	/**
 	 * @return the name

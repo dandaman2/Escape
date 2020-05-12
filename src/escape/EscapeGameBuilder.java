@@ -31,8 +31,7 @@ import escape.util.LocationInitializer;
 import escape.util.PieceTypeInitializer;
 
 import static escape.board.coordinate.CoordinateID.*;
-import static escape.piece.PieceAttributeID.DISTANCE;
-import static escape.piece.PieceAttributeID.FLY;
+import static escape.piece.PieceAttributeID.*;
 import static escape.piece.PieceAttributeType.INTEGER;
 
 /**
@@ -95,7 +94,7 @@ public class EscapeGameBuilder
         //iterate through rules and add them to the game manager
         if(gameInitializer.getRules() != null){
             for(Rule rule: gameInitializer.getRules()){
-                // TODO: 5/9/2020 Add rules to game manager
+                manager.addRule(rule.getId(), rule.getIntValue());
             }
         }
 
@@ -122,7 +121,9 @@ public class EscapeGameBuilder
                 if(location.pieceName != null){
                     if(!manager.hasPieceData(location.pieceName))
                         throw new EscapeException("No rules or attributes were found for piece "+location.pieceName);
-                    manager.getBoard().putPieceAt(EscapePiece.makePiece(location.player, location.pieceName), c);
+                    EscapePiece piece = EscapePiece.makePiece(location.player, location.pieceName);
+                    piece.setValue(manager.getIntPieceAttribute(piece.getName(), VALUE));
+                    manager.getBoard().putPieceAt(piece, c);
                 }
             }
         }
