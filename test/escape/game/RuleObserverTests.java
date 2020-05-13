@@ -18,6 +18,7 @@ import escape.piece.EscapePiece;
 import escape.piece.PieceName;
 import escape.piece.Player;
 import escape.rule.RuleID;
+import escape.util.LocationInitializer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,7 +40,9 @@ public class RuleObserverTests {
                 = new EscapeGameBuilder(new File("config/full_games/StartingHexGame.xml"));
         EscapeGameManager emg = egb.makeGameManager();
         //for toString coverage
-        egb.getGameInitializer();
+        egb.getGameInitializer().getRules()[0].toString();
+        new LocationInitializer(0, 0, null, null, null);
+
         boolean found = false;
         for (int i = 0; i < egb.getGameInitializer().getRules().length; i++) {
             if (egb.getGameInitializer().getRules()[i].getId() == RuleID.SCORE) {
